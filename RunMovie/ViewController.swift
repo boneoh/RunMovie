@@ -55,12 +55,12 @@ class ViewController: NSViewController {
             logger.log("screen \(c) is: \(screen.localizedName, privacy: .public)")
             c += 1
         }
-                       
+                           
         let url = URL(fileURLWithPath: movieFilepath)
         
         //
         
-        let asset = AVAsset(url: url)
+        let asset =   AVAsset(url: url)
             
         let assetKeys = [
             "playable",
@@ -69,6 +69,8 @@ class ViewController: NSViewController {
 
         // Create a new AVPlayerItem with the asset and an
         // array of asset keys to be automatically loaded
+
+        logger.log("*** In ViewController viewDidLoad - creating playerItem")
         
         playerItem = AVPlayerItem(asset: asset,
                                   automaticallyLoadedAssetKeys: assetKeys)
@@ -84,29 +86,43 @@ class ViewController: NSViewController {
         
         // Associate the player item with the player
         
-        player = AVPlayer(playerItem: playerItem)
+        logger.log("*** In ViewController viewDidLoad - create an AVPlayer bound to the player item")
         
-        //
-
+        player =   AVPlayer(playerItem: playerItem)
+        
+        if player.error != nil {
+            let emsg = player.error?.localizedDescription
+            logger.log("*** In ViewController viewDidLoad - player.error  \(emsg ?? "?" , privacy: .public)")
+        }
+        
+        logger.log("*** In ViewController viewDidLoad - set playerView.videoGravity")
+        
         self.playerView.videoGravity = .resizeAspectFill
         
-        // Create a new AVPlayer and associate it with the player view.
-
-        // player = AVPlayer(url: url)
+        logger.log("*** In ViewController viewDidLoad - set playerView.player")
+        
         playerView.player = player
         
         // loop video. there is a small delay :(
+        
+        logger.log("*** In ViewController viewDidLoad - set player observer")
         
         NotificationCenter.default.addObserver(forName: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil, queue: nil) { notification in
             player.seek(to: .zero)
             player.play()
         }
         
-        player.preventsDisplaySleepDuringVideoPlayback = true
+        logger.log("*** In ViewController viewDidLoad - set player preventsDisplaySleepDuringVideoPlayback")
         
+        player.preventsDisplaySleepDuringVideoPlayback = true
+            
+      
         //  player.play()
         
     }
+    
+        
+
     
     func myKeyDown(with event: NSEvent) -> Bool {
         
