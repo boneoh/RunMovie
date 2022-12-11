@@ -72,7 +72,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "&quot;/Volumes/RAID 5/Video/Boneoh/Video Captures/Mandelbrot.mp4&quot;"
+            argument = "&quot;/Volumes/RAID 5/Video/Boneoh/Video Captures/Grapher /Shapes loop.mov&quot;"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
