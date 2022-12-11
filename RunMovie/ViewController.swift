@@ -10,8 +10,15 @@ import AVKit
 import AVFoundation
 import Carbon.HIToolbox
 
+import Network
+
 class ViewController: NSViewController {
     @IBOutlet weak var playerView: AVPlayerView!
+    
+    var connection: NWConnection?
+    
+    var host: NWEndpoint.Host = "127.0.0.1"
+    var port: NWEndpoint.Port = 1000
     
     // var player: AVPlayer!
     
@@ -120,10 +127,160 @@ class ViewController: NSViewController {
       
         //  player.play()
         
+        
+        logger.log("*** In ViewController viewDidLoad - initialize UDP networking - connect")
+        
+        connect()
+
+        logger.log("*** In ViewController viewDidLoad - viewDidLoad completed")
     }
     
-        
+    
+      func send(_ payload: Data) {
+          connection!.send(content: payload, completion: .contentProcessed({ sendError in
+              if let error = sendError {
+                  NSLog("Unable to process and send the data: \(error)")
+              } else {
+                  NSLog("Data has been sent")
+                  self.connection!.receiveMessage { (data, context, isComplete, error) in
+                      guard let myData = data else { return }
+                      NSLog("Received message: " + String(decoding: myData, as: UTF8.self))
+                  }
+              }
+          }))
+      }
+      
+      func connect() {
+          connection = NWConnection(host: host, port: port, using: .udp)
+          
+          connection!.stateUpdateHandler = { (newState) in
+              switch (newState) {
+              case .preparing:
+                  NSLog("Entered state: preparing")
+              
+              case .ready:
+                      
+                  NSLog("Entered state: ready")
+                      
+                      self.connection!.receiveMessage { data, context, isComplete, error in
+                          if let unwrappedError = error {
+                              print("Error: NWError received in \(#function) - \(unwrappedError)")
+                              return
+                          }
+                          guard isComplete, let data = data else {
+                              print("Error: Received nil Data with context - \(String(describing: context))")
+                              return
+                          }
+                       
+                          var myData = data
+                          let keyCode = Int( myData.remove(at: 0) )
+                          
+                          let result = self.handleKeyPress(keyCode: keyCode )
+                      }
+                      
+              case .setup:
+                  NSLog("Entered state: setup")
+              case .cancelled:
+                  NSLog("Entered state: cancelled")
+              case .waiting:
+                  NSLog("Entered state: waiting")
+              case .failed:
+                  NSLog("Entered state: failed")
+              default:
+                  NSLog("Entered an unknown state")
+              }
+          }
+          
+          connection!.viabilityUpdateHandler = { (isViable) in
+              if (isViable) {
+                  NSLog("Connection is viable")
+              } else {
+                  NSLog("Connection is not viable")
+              }
+          }
+          
+          connection!.betterPathUpdateHandler = { (betterPathAvailable) in
+              if (betterPathAvailable) {
+                  NSLog("A better path is availble")
+              } else {
+                  NSLog("No better path is available")
+              }
+          }
+          
+          connection!.start(queue: .global())
+          
+          
+      }
 
+    func handleKeyPress( keyCode: Int ) -> Bool
+    {
+        switch Int( keyCode) {
+        
+        case kVK_Escape:          // Toggle Full Screen
+          
+            logger.log("*** In ViewController handleKeyPress for <Esc>  - setting toggleFullScreen(true)")
+            
+            NSApplication.shared.mainWindow?.toggleFullScreen(true)
+                      
+           return true
+            
+
+        case kVK_ANSI_P:          // Play player
+                
+           logger.log("*** In ViewController handleKeyPress for <Esc>  - invoking player.play()")
+            
+           player.play()
+            
+           return true
+            
+        case kVK_ANSI_Q:          // Quit player
+            
+           logger.log("*** In ViewController handleKeyPress for <Esc>  - invoking terminate(self)")
+                
+           NSApplication.shared.terminate(self)
+            
+           return true
+            
+        case kVK_ANSI_R:          // Rewind player
+           
+           logger.log("*** In ViewController handleKeyPress for <Esc>  - invoking player.seek(to: .zero)")
+                
+           player.seek(to: .zero)
+            
+           return true
+            
+        case kVK_ANSI_S, kVK_Space: // Stop player
+
+           logger.log("*** In ViewController handleKeyPress for <Esc>  - invoking player.pause()")
+                
+           player.pause()
+            
+           return true
+            
+        case kVK_LeftArrow:       // backward one frame
+            
+           logger.log("*** In ViewController handleKeyPress for <Esc>  - invoking            playerItem?.step(byCount: -1)")
+                
+           player.pause()
+           playerItem?.step(byCount: -1)
+            
+           return true
+            
+        case kVK_RightArrow:      // forward one frame
+           
+           logger.log("*** In ViewController handleKeyPress for <Esc>  - invoking            playerItem?.step(byCount: 1)")
+                
+           player.pause()
+           playerItem?.step(byCount: 1)
+            
+           return true
+
+        default:
+           logger.log("*** In ViewController handleKeyPress - unrecognized key code =  \(keyCode, privacy: .public)")
+                
+           return false
+        }
+    }
     
     func myKeyDown(with event: NSEvent) -> Bool {
         
@@ -131,6 +288,14 @@ class ViewController: NSViewController {
         
           guard let locWindow = self.view.window,
              NSApplication.shared.keyWindow === locWindow else { return false }
+        
+        let keyCode = Int( event.keyCode )
+        
+        let result = handleKeyPress( keyCode: keyCode)
+        
+        return result
+        
+/*
           switch Int( event.keyCode) {
           
           case kVK_Escape:          // Toggle Full Screen
@@ -215,6 +380,8 @@ class ViewController: NSViewController {
           default:
              return false
           }
+*/
+        
        }
     
     override var representedObject: Any? {
