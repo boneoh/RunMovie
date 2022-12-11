@@ -84,10 +84,16 @@ class WindowController: NSWindowController, NSWindowDelegate {
         player!.pause()
         player.seek(to: .zero)
         
+        
+        /*
         DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+         
+            logger.log("*** In WindowController windowDidChangeScreen - asyncAfter invoke player.play ")
+         
             player.play()       // Code you want to be delayed
         }
-
+         */
+        
         
     }
     
@@ -134,8 +140,12 @@ class WindowController: NSWindowController, NSWindowDelegate {
             isWindowFullScreen = true
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                
                 logger.log("*** In WindowController checkFullScreen - setting toggleFullScreen(true)")
+                
                 NSApplication.shared.mainWindow?.toggleFullScreen(true)
+                
+                // NSCursor.hide()
             }
 
         }

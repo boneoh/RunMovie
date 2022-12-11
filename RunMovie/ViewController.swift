@@ -108,6 +108,7 @@ class ViewController: NSViewController {
         logger.log("*** In ViewController viewDidLoad - set player observer")
         
         NotificationCenter.default.addObserver(forName: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil, queue: nil) { notification in
+            logger.log("*** In ViewController player observer invoke seek to zero, play")
             player.seek(to: .zero)
             player.play()
         }
