@@ -15,15 +15,20 @@ public var midiClient: MIDIClientRef = 0
 public var midiInPort:MIDIPortRef = 0
 public var midiSrc:MIDIEndpointRef = MIDIGetSource(0) // should be Arturia BeatStep Pro Arturia BeatStepPro
 
+// All of this assumes my BeatStep Pro
+
 // commands
 
-public let noteOn0: UInt8 = 0x90
-public let knob0: UInt8 = 0xB0
-public let play0: UInt8 = 0xFA
-public let pause0: UInt8 = 0xFC
+public let noteOn0: UInt8 = 0x90        // for pads,  used in control mode or drum tracks
+public let knob0: UInt8 = 0xB0          // for knobs, used in control mode
 
-// pads
+// these two are from the transport control
 
+public let play0: UInt8 = 0xFA          // play both ports
+public let pause0: UInt8 = 0xFC         // stop and rewind both ports
+
+// pads                                 // top row of drum pads are not being used, not CV capable in my eurorack
+                                        // so I use them for video control
 public let rewindA: UInt8 = 0x2C
 public let pauseA: UInt8 = 0x2D
 public let playA: UInt8 = 0x2E
@@ -35,22 +40,22 @@ public let playAll: UInt8 = 0x33
 
 // knobs
 
-// 0x0A, 0x4A, 0x47, 0x4C, 0x4D, 0x5D, 0x49, 0x4B
+// top row
 
-public let knob1: UInt8 = 0x0A
-public let knob2: UInt8 = 0x4A
-public let knob3: UInt8 = 0x47
+public let knob1: UInt8 = 0x0A          // port A coarse jog
+public let knob2: UInt8 = 0x4A          // port A medium jog
+public let knob3: UInt8 = 0x47          // port A fine   jog
 public let knob4: UInt8 = 0x4C
-public let knob5: UInt8 = 0x4D
-public let knob6: UInt8 = 0x5D
-public let knob7: UInt8 = 0x49
+public let knob5: UInt8 = 0x4D          // port B coarse jog
+public let knob6: UInt8 = 0x5D          // port B medium jog
+public let knob7: UInt8 = 0x49          // port B fine   jog
 public let knob8: UInt8 = 0x4B
 
-// 0x72, 0x12, 0x13, 0x10, 0x11, 0x5B, 0x4F, 0x48
+// bottom row
 
-public let knob9: UInt8 = 0x72
-public let knob10: UInt8 = 0x12
-public let knob11: UInt8 = 0x13
+public let knob9:  UInt8 = 0x72         // both ports coarse jog
+public let knob10: UInt8 = 0x12         // both ports medium jog
+public let knob11: UInt8 = 0x13         // both ports fine   jog
 public let knob12: UInt8 = 0x10
 public let knob13: UInt8 = 0x11
 public let knob14: UInt8 = 0x5B
@@ -59,9 +64,9 @@ public let knob16: UInt8 = 0x48
 
 // for jog operations
 
-public let jogCoarse: UInt8 = 1
-public let jogMedium: UInt8 = 2
-public let jogFine: UInt8 = 3
+public let jogCoarse: UInt8 = 1         // move one percent per jog click
+public let jogMedium: UInt8 = 2         // move one second  per jog click
+public let jogFine: UInt8 = 3           // move one frame   per jog click
 
 public func getMIDINames()
 {
@@ -131,9 +136,6 @@ public func MyMIDIReadProc(pktList: UnsafePointer<MIDIPacketList>,
                     readProcRefCon: UnsafeMutableRawPointer?, srcConnRefCon: UnsafeMutableRawPointer?) -> Void
 {
     let packetList:MIDIPacketList = pktList.pointee
-        // $$$ let srcRef:MIDIEndpointRef = srcConnRefCon!.load(as: MIDIEndpointRef.self)
-    
-        // $$$ print("MIDI Received From Source: \(getDisplayName(srcRef))")
     
     var packet:MIDIPacket = packetList.packet
     for _ in 1...packetList.numPackets
@@ -146,6 +148,8 @@ public func MyMIDIReadProc(pktList: UnsafePointer<MIDIPacketList>,
         var i = packet.length
         var j = 0
         var dumpStr = ""
+        
+        // allow debugging of MIDI commands
         
         for (_, attr) in bytes.enumerated()
         {
@@ -183,11 +187,11 @@ public func MyMIDIReadProc(pktList: UnsafePointer<MIDIPacketList>,
                 
                 switch ( cmd )
                 {
-                    case noteOn0:   // 90   begin note
+                    case noteOn0:  // 90   begin note on channel 0
                         
                         noteOrKnob = 0
                         
-                    case knob0:   // B0   knob changed in command mode
+                    case knob0:   // B0   knob changed in command mode on channel 0
                         
                         noteOrKnob = 0
 
@@ -200,6 +204,7 @@ public func MyMIDIReadProc(pktList: UnsafePointer<MIDIPacketList>,
                         noteOrKnob = 0
 
                     default:
+                        
                         ignore = true
                         // return  // all others are ignored
                 }
@@ -208,7 +213,7 @@ public func MyMIDIReadProc(pktList: UnsafePointer<MIDIPacketList>,
             {
                 noteOrKnob = attr.value as! UInt8
                 
-                if ( cmd == noteOn0 )       // begin note
+                if ( cmd == noteOn0 )       // begin note on channel 0
                 {
                     
                     if ( noteOrKnob >= 26 && noteOrKnob <= 51 )     // hex 24 -> 33     pads
@@ -216,19 +221,18 @@ public func MyMIDIReadProc(pktList: UnsafePointer<MIDIPacketList>,
                         ignore = false
                     }
                 }
-                else if ( cmd == knob0 )  // knob in Command mode
+                else if ( cmd == knob0 )  // knob in Command mode on channel 0
                 {
                     // check for knobs
                     
                     switch ( noteOrKnob )
                     {
-                        case knob1, knob2, knob3, knob5, knob6, knob7:
+                        case knob1, knob2, knob3, knob5, knob6, knob7, knob9, knob10, knob11:
 
                             ignore = false
-//                        case knob1, knob2, knob3, knob4, knob5, knob6, knob7, knob8,
-//                            , knob9, knob10, knob11, knob12, knob13, knob14, knob15, knob16:
 
                         default:
+                            
                             ignore = true
                     }
                     
@@ -394,6 +398,18 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
                     {
                         jogPlayer( jogScale: jogFine , jogValue: value )
                     }
+                    
+                case knob9:
+                
+                    jogPlayer( jogScale: jogCoarse , jogValue: value )
+                    
+                case knob10:
+                    
+                    jogPlayer( jogScale: jogMedium , jogValue: value )
+                    
+                case knob11:
+                    
+                    jogPlayer( jogScale: jogFine , jogValue: value )
                     
                 default:
                     
