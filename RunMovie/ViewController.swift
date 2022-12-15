@@ -9,7 +9,6 @@ import Cocoa
 import AVKit
 import AVFoundation
 import Carbon.HIToolbox
-import CoreMIDI
 
 import Network
 import Combine
@@ -18,14 +17,8 @@ class ViewController: NSViewController {
     @IBOutlet weak var playerView: AVPlayerView!
     
     var listener: UDPListener!
-
     
     var subscription: AnyCancellable?
-    
-    var midiClient: MIDIClientRef = 0
-    var midiInPort:MIDIPortRef = 0
-    var midiSrc:MIDIEndpointRef = MIDIGetSource(0) // should be Arturia BeatStep Pro Arturia BeatStepPro
-    
     
         // var player: AVPlayer!
     
@@ -158,7 +151,7 @@ class ViewController: NSViewController {
             print("*** In ViewController viewDidLoad $messageReceived sink \(str)")
             
             let intKeyCode = Int.init(str)
-            self.handleKeyPress(keyCode: intKeyCode ?? 0)
+            _ = self.handleKeyPress(keyCode: intKeyCode ?? 0)
         })
         
         /*
@@ -272,189 +265,4 @@ class ViewController: NSViewController {
         }
     }
     
-    func getMIDINames()
-    {
-        let destNames = getDestinationNames();
-        
-        print("Number of MIDI Destinations: \(destNames.count)");
-        for destName in destNames
-        {
-            print("  Destination: \(destName)");
-        }
-        
-        let sourceNames = getSourceNames();
-        
-        print("\nNumber of MIDI Sources: \(sourceNames.count)");
-        for sourceName in sourceNames
-        {
-            print("  Source: \(sourceName)");
-        }
-    }
-    
-    func getDisplayName(_ obj: MIDIObjectRef) -> String
-    {
-        var param: Unmanaged<CFString>?
-        var name: String = "Error"
-        
-        let err: OSStatus = MIDIObjectGetStringProperty(obj, kMIDIPropertyDisplayName, &param)
-        if err == OSStatus(noErr)
-        {
-            name =  param!.takeRetainedValue() as String
-        }
-        
-        return name
-    }
-    
-    func getDestinationNames() -> [String]
-    {
-        var names:[String] = [];
-        
-        let count: Int = MIDIGetNumberOfDestinations();
-        for i in 0..<count {
-            let endpoint:MIDIEndpointRef = MIDIGetDestination(i);
-            
-            if (endpoint != 0)
-            {
-                names.append(getDisplayName(endpoint));
-            }
-        }
-        return names;
-    }
-    
-    func getSourceNames() -> [String]
-    {
-        var names:[String] = [];
-        
-        let count: Int = MIDIGetNumberOfSources();
-        for i in 0..<count {
-            let endpoint:MIDIEndpointRef = MIDIGetSource(i);
-            if (endpoint != 0)
-            {
-                names.append(getDisplayName(endpoint));
-            }
-        }
-        return names;
-    }
-    
 }
-
-    func MyMIDIReadProc(pktList: UnsafePointer<MIDIPacketList>,
-                        readProcRefCon: UnsafeMutableRawPointer?, srcConnRefCon: UnsafeMutableRawPointer?) -> Void
-    {
-        let packetList:MIDIPacketList = pktList.pointee
-            // $$$ let srcRef:MIDIEndpointRef = srcConnRefCon!.load(as: MIDIEndpointRef.self)
-        
-            // $$$ print("MIDI Received From Source: \(getDisplayName(srcRef))")
-        
-        var packet:MIDIPacket = packetList.packet
-        for _ in 1...packetList.numPackets
-        {
-            let bytes = Mirror(reflecting: packet.data).children
-            var dumpStr = ""
-            
-                // bytes mirror contains all the zero values in the ridiulous packet data tuple
-                // so use the packet length to iterate.
-            var i = packet.length
-            var j = 0
-            
-            var cmd: UInt8 = 0
-            var note: UInt8 = 0
-            var knob: UInt8 = 0
-            
-            for (_, attr) in bytes.enumerated()
-            {
-                j = j + 1
-                if ( j == 1 )
-                {
-                    cmd = attr.value as! UInt8
-                    
-                    switch ( cmd )
-                    {
-                        case 144:   // 90   begin note
-                            
-                            note = 0
-                            
-                        case 176:   // B0   knob changed in command mode
-                            
-                            note = 0
-
-                        case 250:   // FA   start == play
-                            
-                            note = 0
-
-                        case 252:   // FC   stop == pause
-                            
-                            note = 0
-
-                        default:
-                            return  // all others are ignored 
-                    }
-                }
-                else if ( j == 2 )
-                {
-                    note = attr.value as! UInt8
-                    
-                    var ignore: Bool = true
-                    
-                    if ( cmd == 144 )       // begin note
-                    {
-                        
-                        if ( note >= 26 && note <= 51 )     // hex 24 -> 33     pads
-                        {
-                            ignore = false
-                        }
-                    }
-                    else if ( cmd == 176 )  // knob in Command mode
-                    {
-                        // check for knobs
-                        
-                        switch ( note )
-                        {
-                            case 0x0A, 0x4A, 0x47, 0x4C, 0x4D, 0x5D, 0x49, 0x4B:    // top row of knobs in Control mode
-                                
-                                ignore = false
-                            
-                            case 0x72, 0x12, 0x13, 0x10, 0x11, 0x5B, 0x4F, 0x48:    // bottom row of knobs in Control mode
-                                
-                                ignore = false
-                                
-                            default:
-
-                                ignore = true
-                        }
-                    }
-                    else if ( cmd == 250 || cmd == 252 )        // start or stop
-                    {
-                        ignore = false
-                    }
-                                
-                    if ( ignore )
-                    {
-                        return
-                    }
-                }
-                else if ( j == 3 )
-                {
-                    knob = attr.value as! UInt8
-                }
-                
-                dumpStr += String(format:"$%02X ", attr.value as! UInt8)
-                
-                i -= 1
-                if (i <= 0)
-                {
-                    break
-                }
-            }
-            
-            // print(dumpStr)
-
-            handleMIDIdata(cmd: cmd, note: note, knob: knob)
-
-            packet = MIDIPacketNext(&packet).pointee
-            
-        }
-        
-
-    }
-

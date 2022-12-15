@@ -12,6 +12,7 @@
 		E83BD8C32947D7B6009E414B /* UDPListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = E83BD8C22947D7B6009E414B /* UDPListener.swift */; };
 		E850C4C227CEB4E4006647A4 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8A18A8627CD9F2A005B0FB7 /* AVFoundation.framework */; platformFilters = (maccatalyst, macos, ); };
 		E850C4C527CEB4E6006647A4 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8A18A8727CD9F2A005B0FB7 /* AVKit.framework */; platformFilters = (maccatalyst, macos, ); };
+		E860BC0B294A8C5E00A6A2C7 /* MIDI.swift in Sources */ = {isa = PBXBuildFile; fileRef = E860BC0A294A8C5E00A6A2C7 /* MIDI.swift */; };
 		E8A18A5827CD9AE6005B0FB7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A18A5727CD9AE6005B0FB7 /* AppDelegate.swift */; };
 		E8A18A5A27CD9AE6005B0FB7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A18A5927CD9AE6005B0FB7 /* ViewController.swift */; };
 		E8A18A5D27CD9AE6005B0FB7 /* RunMovie.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = E8A18A5B27CD9AE6005B0FB7 /* RunMovie.xcdatamodeld */; };
@@ -44,6 +45,7 @@
 		E80B5A4B27CE9FCA0037FF11 /* Globals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Globals.swift; sourceTree = "<group>"; };
 		E8242C4327CE874D00FD67AD /* WindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowController.swift; sourceTree = "<group>"; };
 		E83BD8C22947D7B6009E414B /* UDPListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UDPListener.swift; sourceTree = "<group>"; };
+		E860BC0A294A8C5E00A6A2C7 /* MIDI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDI.swift; sourceTree = "<group>"; };
 		E8A18A5427CD9AE6005B0FB7 /* RunMovie.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RunMovie.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8A18A5727CD9AE6005B0FB7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E8A18A5927CD9AE6005B0FB7 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -112,16 +114,17 @@
 		E8A18A5627CD9AE6005B0FB7 /* RunMovie */ = {
 			isa = PBXGroup;
 			children = (
-				E8EC73E927CEBBC3008EAA6E /* info.plist */,
 				E8A18A5727CD9AE6005B0FB7 /* AppDelegate.swift */,
-				E8A18A5927CD9AE6005B0FB7 /* ViewController.swift */,
 				E8A18A5E27CD9AE7005B0FB7 /* Assets.xcassets */,
+				E80B5A4B27CE9FCA0037FF11 /* Globals.swift */,
+				E8EC73E927CEBBC3008EAA6E /* info.plist */,
 				E8A18A6027CD9AE7005B0FB7 /* Main.storyboard */,
+				E860BC0A294A8C5E00A6A2C7 /* MIDI.swift */,
 				E8A18A6327CD9AE7005B0FB7 /* RunMovie.entitlements */,
 				E8A18A5B27CD9AE6005B0FB7 /* RunMovie.xcdatamodeld */,
-				E8242C4327CE874D00FD67AD /* WindowController.swift */,
-				E80B5A4B27CE9FCA0037FF11 /* Globals.swift */,
 				E83BD8C22947D7B6009E414B /* UDPListener.swift */,
+				E8A18A5927CD9AE6005B0FB7 /* ViewController.swift */,
+				E8242C4327CE874D00FD67AD /* WindowController.swift */,
 			);
 			path = RunMovie;
 			sourceTree = "<group>";
@@ -292,6 +295,7 @@
 				E83BD8C32947D7B6009E414B /* UDPListener.swift in Sources */,
 				E80B5A4C27CE9FCA0037FF11 /* Globals.swift in Sources */,
 				E8A18A5827CD9AE6005B0FB7 /* AppDelegate.swift in Sources */,
+				E860BC0B294A8C5E00A6A2C7 /* MIDI.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
