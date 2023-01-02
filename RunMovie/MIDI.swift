@@ -17,50 +17,120 @@ public var midiSrc:MIDIEndpointRef = MIDIGetSource(0) // should be "Arturia Beat
 
 // All of this assumes my BeatStep Pro
 
+// MIDI Channels are 1 - 16, but commands are suffixed 0x_0 to 0x_F
+
+// We are looking for Port A, Port B, and common subset.
+
+public let channel01: UInt8 = 0x00
+public let channel02: UInt8 = 0x01
+public let channel03: UInt8 = 0x02
+public let channel04: UInt8 = 0x03
+public let channel05: UInt8 = 0x04
+public let channel06: UInt8 = 0x05
+public let channel07: UInt8 = 0x06
+public let channel08: UInt8 = 0x07
+public let channel09: UInt8 = 0x08
+public let channel10: UInt8 = 0x09
+public let channel11: UInt8 = 0x0A  // RunMovie on iMac, port A
+public let channel12: UInt8 = 0x0B  // RunMovie on iMac, port B
+public let channel13: UInt8 = 0x0C  // Maybe some day will have port C?
+public let channel14: UInt8 = 0x0D  // CUDA programs on Jetson Nano
+public let channel15: UInt8 = 0x0E  // Blackmagic Design HyperDeck HD Mini
+public let channel16: UInt8 = 0x0F  // used for all channels, common subset of commands
+
+public let commandMask: UInt8 = 0xF0
+public let channelMask: UInt8 = 0x0F
+
+// channels to be monitored
+
+public var channelListen:       UInt8 = 0       // will be either channelA or channelB
+
+public let channelA:            UInt8 = channel11
+public let channelB:            UInt8 = channel12
+public var channelCommon:       UInt8 = channel16
+
 // commands
 
-public let noteOn0: UInt8 = 0x90        // for pads,  used in control mode or drum tracks
-public let knob0: UInt8 = 0xB0          // for knobs, used in control mode
+public let noteOn:          UInt8 = 0x90        // for pads used in control mode
+public let knobOrButton:    UInt8 = 0xB0        // for knobs and buttons used in control mode
 
 // these two are from the transport control
 
-public let play0: UInt8 = 0xFA          // play both ports
-public let pause0: UInt8 = 0xFC         // stop and rewind both ports
+public let transportPlay: UInt8 = 0xFA
+public let transportStop: UInt8 = 0xFC
 
-// pads                                 // top row of drum pads are not being used, not CV capable in my eurorack
-                                        // so I use them for video control
-public let rewindA: UInt8 = 0x2C
-public let pauseA: UInt8 = 0x2D
-public let playA: UInt8 = 0x2E
-public let rewindB: UInt8 = 0x2F
-public let pauseB: UInt8 = 0x30
-public let playB: UInt8 = 0x31
-public let rewindAll: UInt8 = 0x32
-public let playAll: UInt8 = 0x33
+// pads
+     
+// top row
+
+public let pad09: UInt8 = 0x2C
+public let pad10: UInt8 = 0x2D
+public let pad11: UInt8 = 0x2E
+public let pad12: UInt8 = 0x2F
+public let pad13: UInt8 = 0x30
+public let pad14: UInt8 = 0x31
+public let pad15: UInt8 = 0x32
+public let pad16: UInt8 = 0x33
+
+// bottom row
+
+public let pad01: UInt8 = 0x24
+public let pad02: UInt8 = 0x25
+public let pad03: UInt8 = 0x26
+public let pad04: UInt8 = 0x27
+public let pad05: UInt8 = 0x28
+public let pad06: UInt8 = 0x29
+public let pad07: UInt8 = 0x2A
+public let pad08: UInt8 = 0x2B
 
 // knobs
 
 // top row
 
-public let knob1: UInt8 = 0x0A          // port A coarse jog
-public let knob2: UInt8 = 0x4A          // port A medium jog
-public let knob3: UInt8 = 0x47          // port A fine   jog
-public let knob4: UInt8 = 0x4C          // port A speed
-public let knob5: UInt8 = 0x4D          // port B coarse jog
-public let knob6: UInt8 = 0x5D          // port B medium jog
-public let knob7: UInt8 = 0x49          // port B fine   jog
-public let knob8: UInt8 = 0x4B          // port B speed
+public let knob01: UInt8 = 0x0A //  Pan
+public let knob02: UInt8 = 0x4A //  Brightness
+public let knob03: UInt8 = 0x47 //  Timbre/Harmonic Intens.
+public let knob04: UInt8 = 0x4C //  Vibrato Rate
+public let knob05: UInt8 = 0x4D //  Vibrato Depth
+public let knob06: UInt8 = 0x5D //  Chorus Send Level
+public let knob07: UInt8 = 0x49 //  Attack Time
+public let knob08: UInt8 = 0x4B //  Decay Time
 
 // bottom row
 
-public let knob9:  UInt8 = 0x72         // both ports coarse jog
-public let knob10: UInt8 = 0x12         // both ports medium jog
-public let knob11: UInt8 = 0x13         // both ports fine   jog
-public let knob12: UInt8 = 0x10         // both ports speed
-public let knob13: UInt8 = 0x11
-public let knob14: UInt8 = 0x5B
-public let knob15: UInt8 = 0x4F
-public let knob16: UInt8 = 0x48
+public let knob09: UInt8 = 0x72 //  Undefined
+public let knob10: UInt8 = 0x12 //  General Purpose 3
+public let knob11: UInt8 = 0x13 //  General Purpose 4
+public let knob12: UInt8 = 0x10 //  General Purpose 1
+public let knob13: UInt8 = 0x11 //  General Purpose 2
+public let knob14: UInt8 = 0x5B //  Reverb Send Level
+public let knob15: UInt8 = 0x4F //  Sound Controller 10
+public let knob16: UInt8 = 0x48 //  Release Time
+
+// buttons
+
+// top row
+
+public let button01: UInt8 = 0x14 //  Undefined
+public let button02: UInt8 = 0x15 //  Undefined
+public let button03: UInt8 = 0x16 //  Undefined
+public let button04: UInt8 = 0x17 //  Undefined
+public let button05: UInt8 = 0x18 //  Undefined
+public let button06: UInt8 = 0x19 //  Undefined
+public let button07: UInt8 = 0x1A //  Undefined
+public let button08: UInt8 = 0x1B //  Undefined
+
+// bottom row
+
+public let button09: UInt8 = 0x1C //  Undefined
+public let button10: UInt8 = 0x1D //  Undefined
+public let button11: UInt8 = 0x1E //  Undefined
+public let button12: UInt8 = 0x1F //  Undefined
+public let button13: UInt8 = 0x34 //  Undefined
+public let button14: UInt8 = 0x35 //  Undefined
+public let button15: UInt8 = 0x36 //  Undefined
+public let button16: UInt8 = 0x37 //  Undefined
+
 
 // for jog operations
 
@@ -71,6 +141,11 @@ public let jogFine: UInt8 = 3           // move one frame   per jog click
 // remember the playback rate that may have been set by the user
 
 public var playbackRate: Float = 1.0    // knobs can control the playback rate
+
+//  remember the In and Out times set by the user with the Mark commands
+
+public var markIn:  CMTime = CMTime.zero
+public var markOut: CMTime = CMTime.zero
 
 public func getMIDINames()
 {
@@ -173,14 +248,20 @@ public func MyMIDIReadProc(pktList: UnsafePointer<MIDIPacketList>,
         
         // print(dumpStr)
 
+        var channel: UInt8 = 0
         var cmd: UInt8 = 0
-        var noteOrKnob: UInt8 = 0
+        var padOrKnob: UInt8 = 0
         var value: Int = 0
         
+        var channelStr: String = ""
         var cmdStr: String = ""
-        var noteOrKnobStr: String = ""
+        var padOrKnobStr: String = ""
         var valueStr: String = ""
 
+        var isKnob: Bool = false
+        var isPad: Bool = false
+        var isButton: Bool = false
+        
         var ignore: Bool = false
         
         for (_, attr) in bytes.enumerated()
@@ -189,133 +270,305 @@ public func MyMIDIReadProc(pktList: UnsafePointer<MIDIPacketList>,
             j = j + 1
             if ( j == 1 || j == 4 )
             {
-                cmd = attr.value as! UInt8
+                let rawCmd = attr.value as! UInt8
                 
-                switch ( cmd )
+                cmd = rawCmd & commandMask
+                channel = rawCmd & channelMask
+                
+                let channel1 = channel + 1
+                
+                channelStr = "Channel " + String(format:"%02X ", channel) + " " + String(format:"%i ", channel1) + " "
+                
+                switch ( channel )
                 {
-                    case noteOn0:  // 90   begin note on channel 0
+                    case channelListen, channelCommon:
                         
-                        cmdStr = "Note On "
+                        switch ( cmd )
+                        {
+                            case noteOn:
+                                
+                                cmdStr = "Note On "
+                                
+                            case knobOrButton:
+                                
+                                cmdStr = "Knob "
+                                
+                            case transportPlay:
+                                
+                                cmdStr = "Transport Play "
+                                
+                            case transportStop:
+                                
+                                cmdStr = "Transport Pause "
+                                
+                            default:
+                                cmdStr = channelStr + "Unknown command " + String(format:"$%02X ", cmd) + " " + dumpStr + " "
+                                ignore = true
+                                
+                        }
                         
-                    case knob0:   // B0   knob changed in command mode on channel 0
+                        break
                         
-                        cmdStr = "Knob "
-
-                    case play0:   // FA   start == play
-                        
-                        cmdStr = "Transport Play "
-
-                    case pause0:   // FC   stop == pause
-                        
-                        cmdStr = "Transport Pause "
-
                     default:
-                        cmdStr = "Unknown command " + String(format:"$%02X ", cmd) + " " + dumpStr + " "
-                        ignore = true
-
+                        return
+                        // ignore = true
                 }
             }
             else if ( j == 2 || j == 5 )
             {
-                noteOrKnob = attr.value as! UInt8
+                padOrKnob = attr.value as! UInt8
                 
-                if ( cmd == noteOn0 )       // begin note on channel 0
+                if ( cmd == noteOn )       // begin note
                 {
                     
-                    switch ( noteOrKnob )
+                    switch ( padOrKnob )
                     {
-                        case rewindA:
-                            noteOrKnobStr = "Rewind A "
+                        case pad01:
+                            padOrKnobStr = "pad01 "
+                            isPad = true
                         
-                        case pauseA:
-                            noteOrKnobStr = "Pause A "
-                        
-                        case playA:
-                            noteOrKnobStr = "Play A "
+                        case pad02:
+                            padOrKnobStr = "pad02 "
+                            isPad = true
 
-                        case rewindB:
-                            noteOrKnobStr = "Rewind A "
-                        
-                        case pauseB:
-                            noteOrKnobStr = "Pause B "
-                        
-                        case playB:
-                            noteOrKnobStr = "Play B "
-                            
-                        case rewindAll:
-                            noteOrKnobStr = "Rewind All "
-                        
-                        case playAll:
-                            noteOrKnobStr = "Play All "
+                        case pad03:
+                            padOrKnobStr = "pad03 "
+                            isPad = true
+
+                        case pad04:
+                            padOrKnobStr = "pad04 "
+                            isPad = true
+
+                        case pad05:
+                            padOrKnobStr = "pad05 "
+                            isPad = true
+
+                        case pad06:
+                            padOrKnobStr = "pad06 "
+                            isPad = true
+
+                        case pad07:
+                            padOrKnobStr = "pad07 "
+                            isPad = true
+
+                        case pad08:
+                            padOrKnobStr = "pad08 "
+                            isPad = true
+
+                        case pad09:
+                            padOrKnobStr = "pad09 "
+                            isPad = true
+
+                        case pad10:
+                            padOrKnobStr = "pad10 "
+                            isPad = true
+
+                        case pad11:
+                            padOrKnobStr = "pad11 "
+                            isPad = true
+
+                        case pad12:
+                            padOrKnobStr = "pad12 "
+                            isPad = true
+
+                        case pad13:
+                            padOrKnobStr = "pad13 "
+                            isPad = true
+
+                        case pad14:
+                            padOrKnobStr = "pad14 "
+                            isPad = true
+
+                        case pad15:
+                            padOrKnobStr = "pad15 "
+                            isPad = true
+
+                        case pad16:
+                            padOrKnobStr = "pad16 "
+                            isPad = true
 
                         default:
-                            noteOrKnobStr = "unknown Pad command " + String(format:"$%02X ", noteOrKnob) + " "  + dumpStr + " "
+                            padOrKnobStr = cmdStr + "unknown Pad command " + String(format:"$%02X ", padOrKnob) + " "  + dumpStr + " "
                             ignore = true
                     }
-
+                    
+                    if ( ignore )
+                    {
+                        break
+                    }
                 }
-                else if ( cmd == knob0 )  // knob in Command mode on channel 0
+                else if ( cmd == knobOrButton )  // knob or button in Command mode
                 {
                     // check for knobs
                     
-                    switch ( noteOrKnob )
+                    switch ( padOrKnob )
                     {
-                        // case knob1, knob2, knob3, knob5, knob6, knob7, knob9, knob10, knob11:
 
-                        case knob1:
-                            noteOrKnobStr = "Knob 1 - Jog A Coarse "
-      
-                        case knob2:
-                            noteOrKnobStr = "Knob 2 - Jog A Medium "
+                        case knob01:
+                            padOrKnobStr = "knob01 "
+                            isKnob = true
 
-                        case knob3:
-                            noteOrKnobStr = "Knob 3 - Jog A Fine "
+                        case knob02:
+                            padOrKnobStr = "knob02 "
+                            isKnob = true
 
-                        case knob4:
-                            noteOrKnobStr = "Knob 4 - Play A Speed "
+                        case knob03:
+                            padOrKnobStr = "knob03 "
+                            isKnob = true
 
-                        case knob5:
-                            noteOrKnobStr = "Knob 5 - Jog B Coarse "
+                        case knob04:
+                            padOrKnobStr = "knob04 "
+                            isKnob = true
 
-                        case knob6:
-                            noteOrKnobStr = "Knob 6 - Jog B Medium "
+                        case knob05:
+                            padOrKnobStr = "knob05 "
+                            isKnob = true
 
-                        case knob7:
-                            noteOrKnobStr = "Knob 7 - Jog B Fine "
+                        case knob06:
+                            padOrKnobStr = "knob06 "
+                            isKnob = true
 
-                        case knob8:
-                            noteOrKnobStr = "Knob 8 - Play B Speed "
+                        case knob07:
+                            padOrKnobStr = "knob07 "
+                            isKnob = true
 
-                        case knob9:
-                            noteOrKnobStr = "Knob 9 - Jog All Coarse "
+                        case knob08:
+                            padOrKnobStr = "knob08 "
+                            isKnob = true
+
+                        case knob09:
+                            padOrKnobStr = "knob09 "
+                            isKnob = true
 
                         case knob10:
-                            noteOrKnobStr = "Knob 10 - Jog All Medium "
+                            padOrKnobStr = "knob10 "
+                            isKnob = true
 
                         case knob11:
-                            noteOrKnobStr = "Knob 11 - Jog All Fine "
+                            padOrKnobStr = "knob11 "
+                            isKnob = true
 
                         case knob12:
-                            noteOrKnobStr = "Knob 12 - Play All Speed "
+                            padOrKnobStr = "knob12 "
+                            isKnob = true
+
+                        case knob13:
+                            padOrKnobStr = "knob13 "
+                            isKnob = true
+
+                        case knob14:
+                            padOrKnobStr = "knob14 "
+                            isKnob = true
+
+                        case knob15:
+                            padOrKnobStr = "knob15 "
+                            isKnob = true
+
+                        case knob16:
+                            padOrKnobStr = "knob16 "
+                            isKnob = true
+
+                        case button01:
+                            padOrKnobStr = "button01 "
+                            isButton = true
+
+                        case button02:
+                            padOrKnobStr = "button02 "
+                            isButton = true
+
+                        case button03:
+                            padOrKnobStr = "button03 "
+                            isButton = true
+
+                        case button04:
+                            padOrKnobStr = "button04 "
+                            isButton = true
+
+                        case button05:
+                            padOrKnobStr = "button05 "
+                            isButton = true
+
+                        case button06:
+                            padOrKnobStr = "button06 "
+                            isButton = true
+
+                        case button07:
+                            padOrKnobStr = "button07 "
+                            isButton = true
+
+                        case button08:
+                            padOrKnobStr = "button08 "
+                            isButton = true
+
+                        case button09:
+                            padOrKnobStr = "button09 "
+                            isButton = true
+
+                        case button10:
+                            padOrKnobStr = "button10 "
+                            isButton = true
+
+                        case button11:
+                            padOrKnobStr = "button11 "
+                            isButton = true
+
+                        case button12:
+                            padOrKnobStr = "button12 "
+                            isButton = true
+
+                        case button13:
+                            padOrKnobStr = "button13 "
+                            isButton = true
+
+                        case button14:
+                            padOrKnobStr = "button14 "
+                            isButton = true
+
+                        case button15:
+                            padOrKnobStr = "button15 "
+                            isButton = true
+
+                        case button16:
+                            padOrKnobStr = "button16 "
+                            isButton = true
 
                         default:
-                            noteOrKnobStr = "unknown Knob command " + String(format:"$%02X ", noteOrKnob) + " " + dumpStr + " "
+                            padOrKnobStr = cmdStr + "unknown Knob or Button command " + String(format:"$%02X ", padOrKnob) + " " + dumpStr + " "
                             ignore = true
                     }
                     
+                    if ( ignore )
+                    {
+                        break
+                    }
+                    
+                    if ( isPad )
+                    {
+                        cmdStr += "Pad "
+                    }
+                    else if ( isKnob )
+                    {
+                        cmdStr += "Knob "
+                    }
+                    else if ( isButton )
+                    {
+                        cmdStr += "Button "
+                    }
+                    
                 }
-                else if ( cmd == play0 )        // play
+                else if ( cmd == transportPlay )
                 {
-                    noteOrKnobStr = "Transport Play "
+                    padOrKnobStr = cmdStr + "Transport Play "
+                    ignore = false
                 }
-                else if ( cmd == pause0 )       // pause
+                else if ( cmd == transportStop )
                 {
-                    noteOrKnobStr = "Transport Pause "
+                    padOrKnobStr = cmdStr + "Transport Pause "
                     ignore = false
                 }
                 else
                 {
-                    noteOrKnobStr = "Unknown command " + String(format:"$%02X ", cmd) + " " + dumpStr + " "
+                    padOrKnobStr = cmdStr + "Unknown command " + String(format:"$%02X ", cmd) + " " + dumpStr + " "
                     ignore = true
                 }
                 
@@ -335,13 +588,13 @@ public func MyMIDIReadProc(pktList: UnsafePointer<MIDIPacketList>,
             }
         }
         
-        dumpStr = cmdStr + noteOrKnobStr + valueStr
+        dumpStr = cmdStr + padOrKnobStr + valueStr
         
         print(dumpStr)
 
         if ( ignore == false )
         {
-            handleMIDIdata(cmd: cmd, noteOrKnob: noteOrKnob, value: value)
+            handleMIDIdata(cmd: cmd, noteOrKnob: padOrKnob, value: value)
         }
         
         packet = MIDIPacketNext(&packet).pointee
@@ -364,161 +617,269 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
     
     switch ( cmd )
     {
-        case noteOn0:      // begin note on MIDI channel zero
+        case noteOn:      // begin note
             
             switch ( noteOrKnob )
             {
-                case rewindA:      // rewind port A
-                    
-                    if ( port == portA )
-                    {
-                        player!.pause()
-                        player!.seek(to: .zero)
-                    }
-                    
-                case pauseA:      // stop port A
-                    
-                    if ( port == portA )
-                    {
-                        player!.pause()
-                    }
-                    
-                case playA:      // play port A
-                    
-                    if ( port == portA )
-                    {
-                        player!.rate = playbackRate
-                        // player!.play()
-                    }
-                    
-                case rewindB:      // rewind port B
-                    
-                    if ( port == portB )
-                    {
-                        player!.pause()
-                        player!.seek(to: .zero)
-                    }
-                    
-                case pauseB:      // stop port B
-                    
-                    if ( port == portB )
-                    {
-                        player!.pause()
-                    }
-                    
-                case playB:      // play port B
-                    
-                    if ( port == portB )
-                    {
-                        player!.rate = playbackRate
-                        // player!.play()
-                    }
-                    
-                case rewindAll:      // rewind both A + B
+                case pad01:      // rewind aka go to start
                     
                     player!.pause()
-                    player.seek(to: .zero)
+                    player!.seek(to: .zero)
                     
-                case playAll:      // play both A + B
+                case pad02:      // pause
+
+                    player!.pause()
+                    
+                case pad03:      // play
                     
                     player!.rate = playbackRate
-                    // player!.play()
                     
+                case pad04:       // go to end
+                    
+                    player!.pause()
+                    player!.seek(to: .zero)
+                    
+                case pad05:
+                    
+                    break
+                    
+                case pad06:
+                    
+                    break
+
+                case pad07:
+                    
+                    break
+
+                case pad08:
+                    
+                    break
+
+                case pad09:
+                    
+                    break
+
+                case pad10:
+                    
+                    break
+
+                case pad11:
+                    
+                    break
+
+                case pad12:
+                    
+                    break
+
+                case pad13:
+                    
+                    break
+
+                case pad14:
+                    
+                    break
+
+                case pad15:
+                    
+                    break
+
+                case pad16:
+                    
+                    break
+                   
                 default:
                     
                     return
             }
             
-        case knob0:      // knob in Control mode on MIDI channel zero
+        case knobOrButton:
             
             // print( dumpStr )
             
             switch ( noteOrKnob )
             {
-                case knob1:
-                
-                    if ( port == portA )
-                    {
-                        jogPlayer( jogScale: jogCoarse , jogValue: value )
-                    }
-                    
-                case knob2:
-                    
-                    if ( port == portA )
-                    {
-                        jogPlayer( jogScale: jogMedium , jogValue: value )
-                    }
-                    
-                case knob3:
-                    
-                    if ( port == portA )
-                    {
-                        jogPlayer( jogScale: jogFine , jogValue: value )
-                    }
-                    
-                case knob4:
-                    
-                    if ( port == portA )
-                    {
-                        playerSpeed(speedValue: value ) // set playback speed and direction
-                    }
+                case knob01:
 
-                case knob5:
-                
-                    if ( port == portB )
-                    {
-                        jogPlayer( jogScale: jogCoarse , jogValue: value )
-                    }
-                    
-                case knob6:
-                    
-                    if ( port == portB )
-                    {
-                        jogPlayer( jogScale: jogMedium , jogValue: value )
-                    }
-                    
-                case knob7:
-                    
-                    if ( port == portB )
-                    {
-                        jogPlayer( jogScale: jogFine , jogValue: value )
-                    }
-                    
-                case knob8:
-                    
-                    if ( port == portB )
-                    {
-                        playerSpeed(speedValue: value ) // set playback speed and direction
-                    }
-                    
-                case knob9:
-                
                     jogPlayer( jogScale: jogCoarse , jogValue: value )
                     
-                case knob10:
+                case knob02:
                     
                     jogPlayer( jogScale: jogMedium , jogValue: value )
                     
-                case knob11:
+                case knob03:
                     
                     jogPlayer( jogScale: jogFine , jogValue: value )
                     
-                case knob12:
+                case knob04:
                     
                     playerSpeed(speedValue: value ) // set playback speed and direction
+
+                case knob05:
+                    
+                    break
+
+                case knob06:
+                    
+                    break
+
+                case knob07:
+                    
+                    break
+
+                case knob08:
+                    
+                    break
+
+                case knob09:
+                    
+                    break
+
+                case knob10:
+                    
+                    break
+
+                case knob11:
+                    
+                    break
+
+                case knob12:
+                    
+                    break
+
+                case knob13:
+                    
+                    break
+
+                case knob14:
+                    
+                    break
+
+                case knob15:
+                    
+                    break
+
+                case knob16:
+                    
+                    break
+                    
+                case button01:      // rewind aka go to start
+                    
+                    player!.pause()
+                    player!.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
+                    
+                case button02:      // pause
+
+                    player!.pause()
+                    
+                case button03:      // play
+                    
+                    player!.rate = playbackRate
+                    
+                case button04:       // go to end
+                    
+                    player!.pause()
+                    
+                    let endOfMovie = playerItem.asset.duration
+                    
+                    player!.seek(to: endOfMovie, toleranceBefore: .zero, toleranceAfter: .zero)
+                    
+                case button05:
+                    
+                    // clear In mark
+                    
+                    markIn = CMTime.zero
+                    
+                    break
+
+                case button06:
+                    
+                    // clear Out mark
+                    
+                    markOut = playerItem.asset.duration
+ 
+                    break
+
+                case button07:
+                    
+                    // clear both In and Out marks
+                    
+                    markIn = CMTime.zero
+                    
+                    markOut = playerItem.asset.duration
+                    
+                    break
+
+                case button08:
+                    
+                    // Mark In
+                    
+                    markIn = player.currentTime()
+                    
+                    break
+
+                case button09:
+                    
+                    // Mark Out
+                    
+                    markOut = player.currentTime()
+                    
+                    break
+
+                case button10:
+                    
+                    // Go To In mark
+                    
+                    player!.pause()
+                    player.seek(to: markIn, toleranceBefore: .zero, toleranceAfter: .zero)
+                    
+                    break
+
+                case button11:
+                    
+                    // Go To Out mark
+                    
+                    player!.pause()
+                    player.seek(to: markOut, toleranceBefore: .zero, toleranceAfter: .zero)
+                    
+                    break
+
+                case button12:
+                    
+                    break
+
+                case button13:
+                    
+                    break
+
+                case button14:
+                    
+                    break
+
+                case button15:
+                    
+                    break
+
+                case button16:
+                    
+                    playbackRate = 1.0
+                    
+                    markIn = CMTime.zero
+                    
+                    markOut = playerItem.asset.duration
+                    
+                    break
 
                 default:
                     
                     return
             }
-            
-            
-        case play0:      // play on MIDI channel zero
+                        
+        case transportPlay:
             
             player!.rate = playbackRate
             player!.play()
             
-        case pause0:      // pause on MIDI channel zero
+        case transportStop:
             
             player!.pause()
             
