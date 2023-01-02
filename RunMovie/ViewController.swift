@@ -45,6 +45,8 @@ class ViewController: NSViewController {
             c += 1
         }
         
+        channelListen = channel11
+        
         if CommandLine.argc >= 2
         {
             movieFilepath = CommandLine.arguments[1]
@@ -68,6 +70,10 @@ class ViewController: NSViewController {
         {
             movieFilepath = CommandLine.arguments[0]
         }
+        
+        let tempChannel = channelListen + 1     // MIDI Channel data is from 0x00 to 0x0F, but the channels are named one through fifteen
+        
+        logger.log("*** In ViewController viewDidLoad - MIDI Channel =  \(tempChannel, privacy: .public)")
         
         logger.log("*** In ViewController viewDidLoad - UDP Port =  \(port.debugDescription, privacy: .public)")
         
@@ -135,7 +141,7 @@ class ViewController: NSViewController {
         
         NotificationCenter.default.addObserver(forName: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil, queue: nil) { notification in
             logger.log("*** In ViewController player observer invoke seek to zero, play")
-            player.seek(to: .zero)
+            player.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
             player.play()
         }
         
@@ -211,7 +217,7 @@ class ViewController: NSViewController {
                 
                 logger.log("*** In ViewController handleKeyPress for <Esc>  - invoking player.seek(to: .zero)")
                 
-                player.seek(to: .zero)
+                player.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
                 
                 return true
                 

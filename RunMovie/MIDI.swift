@@ -33,17 +33,17 @@ public let channel09: UInt8 = 0x08
 public let channel10: UInt8 = 0x09
 public let channel11: UInt8 = 0x0A  // RunMovie on iMac, port A
 public let channel12: UInt8 = 0x0B  // RunMovie on iMac, port B
-public let channel13: UInt8 = 0x0C  // Maybe some day will have port C?
+public let channel13: UInt8 = 0x0C  // Maybe some day RunMovie will have port C?
 public let channel14: UInt8 = 0x0D  // CUDA programs on Jetson Nano
 public let channel15: UInt8 = 0x0E  // Blackmagic Design HyperDeck HD Mini
-public let channel16: UInt8 = 0x0F  // used for all channels, common subset of commands
+public let channel16: UInt8 = 0x0F  // common subset of commands, used for all channels
 
 public let commandMask: UInt8 = 0xF0
 public let channelMask: UInt8 = 0x0F
 
 // channels to be monitored
 
-public var channelListen:       UInt8 = 0       // will be either channelA or channelB
+public var channelListen:       UInt8 = 0       // for RunMovie will be either channelA or channelB
 
 public let channelA:            UInt8 = channel11
 public let channelB:            UInt8 = channel12
@@ -262,8 +262,6 @@ public func MyMIDIReadProc(pktList: UnsafePointer<MIDIPacketList>,
         var isPad: Bool = false
         var isButton: Bool = false
         
-        var ignore: Bool = false
-        
         for (_, attr) in bytes.enumerated()
         {
             
@@ -302,8 +300,11 @@ public func MyMIDIReadProc(pktList: UnsafePointer<MIDIPacketList>,
                                 cmdStr = "Transport Pause "
                                 
                             default:
+                                
                                 cmdStr = channelStr + "Unknown command " + String(format:"$%02X ", cmd) + " " + dumpStr + " "
-                                ignore = true
+                                print( cmdStr)
+                                
+                                return
                                 
                         }
                         
@@ -311,7 +312,7 @@ public func MyMIDIReadProc(pktList: UnsafePointer<MIDIPacketList>,
                         
                     default:
                         return
-                        // ignore = true
+ 
                 }
             }
             else if ( j == 2 || j == 5 )
@@ -388,14 +389,13 @@ public func MyMIDIReadProc(pktList: UnsafePointer<MIDIPacketList>,
                             isPad = true
 
                         default:
+                            
                             padOrKnobStr = cmdStr + "unknown Pad command " + String(format:"$%02X ", padOrKnob) + " "  + dumpStr + " "
-                            ignore = true
+                            print(padOrKnobStr)
+                            
+                            return
                     }
-                    
-                    if ( ignore )
-                    {
-                        break
-                    }
+                     
                 }
                 else if ( cmd == knobOrButton )  // knob or button in Command mode
                 {
@@ -533,13 +533,12 @@ public func MyMIDIReadProc(pktList: UnsafePointer<MIDIPacketList>,
                             isButton = true
 
                         default:
+                            
                             padOrKnobStr = cmdStr + "unknown Knob or Button command " + String(format:"$%02X ", padOrKnob) + " " + dumpStr + " "
-                            ignore = true
-                    }
-                    
-                    if ( ignore )
-                    {
-                        break
+                            
+                            print(padOrKnobStr)
+                            
+                            return
                     }
                     
                     if ( isPad )
@@ -559,17 +558,18 @@ public func MyMIDIReadProc(pktList: UnsafePointer<MIDIPacketList>,
                 else if ( cmd == transportPlay )
                 {
                     padOrKnobStr = cmdStr + "Transport Play "
-                    ignore = false
                 }
                 else if ( cmd == transportStop )
                 {
                     padOrKnobStr = cmdStr + "Transport Pause "
-                    ignore = false
                 }
                 else
                 {
                     padOrKnobStr = cmdStr + "Unknown command " + String(format:"$%02X ", cmd) + " " + dumpStr + " "
-                    ignore = true
+                    
+                    print(padOrKnobStr)
+                    
+                    return
                 }
                 
             }
@@ -592,10 +592,7 @@ public func MyMIDIReadProc(pktList: UnsafePointer<MIDIPacketList>,
         
         print(dumpStr)
 
-        if ( ignore == false )
-        {
-            handleMIDIdata(cmd: cmd, noteOrKnob: padOrKnob, value: value)
-        }
+        handleMIDIdata(cmd: cmd, noteOrKnob: padOrKnob, value: value)
         
         packet = MIDIPacketNext(&packet).pointee
         
@@ -621,31 +618,37 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
             
             switch ( noteOrKnob )
             {
-                case pad01:      // rewind aka go to start
+                    
+                case pad01:
+                    
+                    break
+
+                case pad02:      // go to start
                     
                     player!.pause()
                     player!.seek(to: .zero)
                     
-                case pad02:      // pause
+                case pad03:      // pause
 
                     player!.pause()
                     
-                case pad03:      // play
+                case pad04:      // play
                     
                     player!.rate = playbackRate
                     
-                case pad04:       // go to end
+                case pad05:      // play In to Out
+                    
+                    playInToOut()
+
+                    break
+                    
+                case pad06:       // go to end
                     
                     player!.pause()
-                    player!.seek(to: .zero)
                     
-                case pad05:
+                    let endOfMovie = playerItem.asset.duration
                     
-                    break
-                    
-                case pad06:
-                    
-                    break
+                    player!.seek(to: endOfMovie, toleranceBefore: .zero, toleranceAfter: .zero)
 
                 case pad07:
                     
@@ -762,28 +765,70 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
                     
                     break
                     
-                case button01:      // rewind aka go to start
+                case button01:
+                    
+                    break
+                    
+                case button02:      // rewind aka go to start
                     
                     player!.pause()
                     player!.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
                     
-                case button02:      // pause
+                case button03:      // pause
 
                     player!.pause()
                     
-                case button03:      // play
+                case button04:      // play
                     
                     player!.rate = playbackRate
                     
-                case button04:       // go to end
+                case button05:      // play In to Out
+                    
+                    playInToOut()
+
+                case button06:       // go to end
                     
                     player!.pause()
                     
                     let endOfMovie = playerItem.asset.duration
                     
                     player!.seek(to: endOfMovie, toleranceBefore: .zero, toleranceAfter: .zero)
+  
+                case button07:
                     
-                case button05:
+                    // Go To In mark
+                    
+                    player!.pause()
+                    player.seek(to: markIn, toleranceBefore: .zero, toleranceAfter: .zero)
+                    
+                    break
+
+                case button08:
+                    
+                    // Go To Out mark
+                    
+                    player!.pause()
+                    player.seek(to: markOut, toleranceBefore: .zero, toleranceAfter: .zero)
+                    
+                    break
+                    
+                case button09:
+                    
+                    // Mark In
+                    
+                    markIn = player.currentTime()
+                    
+                    break
+
+                case button10:
+                    
+                    // Mark Out
+                    
+                    markOut = player.currentTime()
+                    
+                    break
+
+                case button11:
                     
                     // clear In mark
                     
@@ -791,7 +836,7 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
                     
                     break
 
-                case button06:
+                case button12:
                     
                     // clear Out mark
                     
@@ -799,7 +844,7 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
  
                     break
 
-                case button07:
+                case button13:
                     
                     // clear both In and Out marks
                     
@@ -809,59 +854,22 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
                     
                     break
 
-                case button08:
-                    
-                    // Mark In
-                    
-                    markIn = player.currentTime()
-                    
-                    break
-
-                case button09:
-                    
-                    // Mark Out
-                    
-                    markOut = player.currentTime()
-                    
-                    break
-
-                case button10:
-                    
-                    // Go To In mark
-                    
-                    player!.pause()
-                    player.seek(to: markIn, toleranceBefore: .zero, toleranceAfter: .zero)
-                    
-                    break
-
-                case button11:
-                    
-                    // Go To Out mark
-                    
-                    player!.pause()
-                    player.seek(to: markOut, toleranceBefore: .zero, toleranceAfter: .zero)
-                    
-                    break
-
-                case button12:
-                    
-                    break
-
-                case button13:
-                    
-                    break
-
                 case button14:
+                    
+                    // record, should be handled by MIDI2UDP program
                     
                     break
 
                 case button15:
                     
+                    // stop recording, should be handled by MIDI2UDP program
+                    
                     break
 
                 case button16:
                     
-                    playbackRate = 1.0
+                    playbackRate = 1.0      // Normal speed the next time Play is requested
+                    player!.pause()
                     
                     markIn = CMTime.zero
                     
@@ -877,7 +885,6 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
         case transportPlay:
             
             player!.rate = playbackRate
-            player!.play()
             
         case transportStop:
             
@@ -972,16 +979,55 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
         }
         
         let span = Double(value) * unitSize / videoFPS
-        
+                
         player!.pause()
 
         let currentTime = player.currentTime()
         let newTime = currentTime.seconds.advanced(by: span)
         
         let seekTime = CMTimeMakeWithSeconds(newTime, preferredTimescale: 1000 )
-                
-        player.seek(to: seekTime)
+              
+        player.seek(to: seekTime, toleranceBefore: .zero, toleranceAfter: .zero)
         
     }
+    
+    // Similar code in VideoFilters program, ContentView.swift
+    
+    func playInToOut() {
+        
+        player!.pause()
 
+        player?.seek(to:  markIn, toleranceBefore: .zero, toleranceAfter: .zero)
+        
+        /*
+        
+         NotificationCenter.default.removeObserver(self)
+        
+            player?.actionAtItemEnd = .none
+            NotificationCenter.default.addObserver(self,
+                selector: #selector(self.playerItemDidReachMarkOut),
+                 name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,
+                 object: player?.currentItem)
+
+        
+        player?.currentItem!.reversePlaybackEndTime =  markIn
+        player?.currentItem!.forwardPlaybackEndTime =  markOut
+        
+        player!.rate = playbackRate
+        
+        */
+        
+    }
+    
+    /*
+    
+    @objc func playerItemDidReachMarkOut(notification: NSNotification) {
+               
+        if let playerItem: AVPlayerItem = notification.object as? AVPlayerItem {
+            playerItem.seek(to: markIn, completionHandler: nil)
+        }
+    }
+    
+    */
+    
 }

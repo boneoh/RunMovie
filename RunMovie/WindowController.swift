@@ -82,7 +82,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
         checkFullScreen()
              
         player!.pause()
-        player.seek(to: .zero)
+        player.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
         
         
         /*
