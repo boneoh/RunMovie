@@ -249,28 +249,39 @@ class ViewController: NSViewController {
                 
             // Function keys same as MIDI keys!
                 
-            case kVK_F1:
+            case kVK_F2:
             
-               // rewind aka go to start
+                // rewind aka go to start
                     
-                    player!.pause()
-                    player!.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
+                player!.pause()
+                player!.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
                 
                 return true
                 
-            case kVK_F2:      // pause
+            case kVK_F3:      // pause
                 
                 player!.pause()
                 
                 return true
                 
-            case kVK_F3:      // play
+            case kVK_F4:      // play
                 
                 player!.rate = playbackRate
                 
                 return true
                 
-            case kVK_F4:       // go to end
+            case kVK_F5:      // play in to out
+                
+                // to-do implement this!
+                
+                player!.pause()
+                player.seek(to: markIn, toleranceBefore: .zero, toleranceAfter: .zero)
+                
+                // player!.rate = playbackRate
+                
+                return true
+
+            case kVK_F6:       // go to end
                 
                 player!.pause()
                 
@@ -280,49 +291,7 @@ class ViewController: NSViewController {
                 
                 return true
                 
-            case kVK_F5:
-            
-                // clear In mark
-                
-                markIn = CMTime.zero
-                
-                return true
-                
-            case kVK_F6:
-                
-                // clear Out mark
-                
-                markOut = playerItem.asset.duration
-
-                return true
-                
             case kVK_F7:
-                
-                // clear both In and Out marks
-                
-                markIn = CMTime.zero
-                
-                markOut = playerItem.asset.duration
-
-                return true
-                
-            case kVK_F8:
-                
-                // Mark In
-                
-                markIn = player.currentTime()
-
-                return true
-                
-            case kVK_F9:
-                
-                // Mark Out
-                
-                markOut = player.currentTime()
-                
-                return true
-                
-            case kVK_F10:
                 
                 // Go To In mark
                 
@@ -331,7 +300,7 @@ class ViewController: NSViewController {
 
                 return true
                 
-            case kVK_F11:
+            case kVK_F8:
                 
                 // Go To Out mark
                 
@@ -340,8 +309,36 @@ class ViewController: NSViewController {
 
                 return true
                 
+            case kVK_F9:
+                
+                // Mark In
+                
+                markIn = player.currentTime()
+
+                return true
+             
+            case kVK_F10:
+                
+                // Mark Out
+                
+                markOut = player.currentTime()
+                
+                return true
+                
+            case kVK_F11:
+            
+                // clear In mark
+                
+                markIn = CMTime.zero
+                
+                return true
+                
             case kVK_F12:
                 
+                // clear Out mark
+                
+                markOut = playerItem.asset.duration
+
                 return true
 
             default:
