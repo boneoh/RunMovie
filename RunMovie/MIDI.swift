@@ -697,6 +697,8 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
 
                 case pad16:
                     
+                    Globals.viewController?.exportScreenShot()
+                    
                     break
                    
                 default:
@@ -854,7 +856,7 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
 
                 case button16:
                     
-                    Globals.viewController?.reset()
+                    Globals.viewController?.exportScreenShot()
                     
                     break
 

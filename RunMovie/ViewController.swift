@@ -92,6 +92,8 @@ public class ViewController: NSViewController {
         
         let url = URL(fileURLWithPath: Globals.movieFilepath)
         
+        Globals.movieFileURL = url
+        
             //
         
         let asset =   AVAsset(url: url)
@@ -324,6 +326,14 @@ public class ViewController: NSViewController {
 
                 return true
 
+            case kVK_ANSI_Period:
+                
+                // screen shot
+                
+                exportScreenShot()
+                
+                return true
+                
             default:
                 Globals.logger.log("*** In ViewController handleKeyPress - unrecognized key code =  \(keyCode, privacy: .public)")
                 
@@ -476,5 +486,49 @@ public class ViewController: NSViewController {
     {
         clearMarkIn()
         clearMarkOut()
+    }
+    
+    public func exportScreenShot() {
+
+        /*
+              let asset = AVAsset(url: videoURL)
+              let generator = AVAssetImageGenerator.init(asset: asset)
+              let cgImage = try! generator.copyCGImage(at: CMTime (0, 1), actualTime: nil)
+              firstFrame.image = UIImage(cgImage: cgImage) //firstFrame is UIImage in table cell
+         
+         */
+        
+        let time = Globals.player.currentTime()
+        
+        let asset = AVAsset(url: Globals.movieFileURL)
+        
+        let generator = AVAssetImageGenerator.init(asset: asset)
+        
+        let cgImage = try! generator.copyCGImage(at: time, actualTime: nil)
+        
+        let nsImage = NSImage(cgImage: cgImage, size: .zero)
+        
+        let directoryURL = FileManager.default.urls(for: .picturesDirectory, in: .userDomainMask)[0]
+        
+        var fn = Globals.movieFileURL.deletingPathExtension().lastPathComponent
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = ".yyyyMMdd.HHmmss"
+        let dateTime = formatter.string(from: Date.now)
+               
+        fn += dateTime
+        
+        let fileURL = URL(fileURLWithPath: fn, relativeTo: directoryURL).appendingPathExtension("png")
+        
+        // save the image to the url
+        
+        if nsImage.pngWrite(to: fileURL )
+        {
+            NSLog("Screen shot export successful")
+        }
+        else
+        {
+            NSLog("Screen shot export FAILED")
+        }
     }
 }

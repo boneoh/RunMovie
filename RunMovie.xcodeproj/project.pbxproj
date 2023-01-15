@@ -21,6 +21,7 @@
 		E8A18A6D27CD9AE7005B0FB7 /* RunMovieTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A18A6C27CD9AE7005B0FB7 /* RunMovieTests.swift */; };
 		E8A18A7727CD9AE7005B0FB7 /* RunMovieUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A18A7627CD9AE7005B0FB7 /* RunMovieUITests.swift */; };
 		E8A18A7927CD9AE7005B0FB7 /* RunMovieUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A18A7827CD9AE7005B0FB7 /* RunMovieUITestsLaunchTests.swift */; };
+		E8EA171B2974917D0085273E /* NSImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8EA171A2974917C0085273E /* NSImage.swift */; };
 		E8EC73EA27CEBBC3008EAA6E /* info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E8EC73E927CEBBC3008EAA6E /* info.plist */; };
 /* End PBXBuildFile section */
 
@@ -60,6 +61,7 @@
 		E8A18A7827CD9AE7005B0FB7 /* RunMovieUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunMovieUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		E8A18A8627CD9F2A005B0FB7 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		E8A18A8727CD9F2A005B0FB7 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
+		E8EA171A2974917C0085273E /* NSImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSImage.swift; sourceTree = "<group>"; };
 		E8EC73E927CEBBC3008EAA6E /* info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -124,6 +126,7 @@
 				E8A18A5B27CD9AE6005B0FB7 /* RunMovie.xcdatamodeld */,
 				E83BD8C22947D7B6009E414B /* UDPListener.swift */,
 				E8A18A5927CD9AE6005B0FB7 /* ViewController.swift */,
+				E8EA171A2974917C0085273E /* NSImage.swift */,
 				E8242C4327CE874D00FD67AD /* WindowController.swift */,
 			);
 			path = RunMovie;
@@ -293,6 +296,7 @@
 				E8242C4427CE874D00FD67AD /* WindowController.swift in Sources */,
 				E8A18A5D27CD9AE6005B0FB7 /* RunMovie.xcdatamodeld in Sources */,
 				E83BD8C32947D7B6009E414B /* UDPListener.swift in Sources */,
+				E8EA171B2974917D0085273E /* NSImage.swift in Sources */,
 				E80B5A4C27CE9FCA0037FF11 /* Globals.swift in Sources */,
 				E8A18A5827CD9AE6005B0FB7 /* AppDelegate.swift in Sources */,
 				E860BC0B294A8C5E00A6A2C7 /* MIDI.swift in Sources */,

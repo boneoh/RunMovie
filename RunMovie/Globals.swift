@@ -17,6 +17,7 @@ public class Globals
     public static var playerItem: AVPlayerItem!
     public static var player: AVPlayer!
     public static var movieFilepath: String = ""
+    public static var movieFileURL: URL!
     public static var isWindowCreated: Bool = false
     public static var isWindowFullScreen: Bool = false
     public static var mainScreenName: String = ""
