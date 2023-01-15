@@ -10,10 +10,10 @@ import AVKit
 import AVFoundation
 import Carbon.HIToolbox
 
-import Network
+// import Network
 import Combine
 
-class ViewController: NSViewController {
+public class ViewController: NSViewController {
     @IBOutlet weak var playerView: AVPlayerView!
     
     var listener: UDPListener!
@@ -24,12 +24,14 @@ class ViewController: NSViewController {
     
         // var player: AVPlayer!
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         
             // Do any additional setup after loading the view.
         
-        logger.log("*** In ViewController viewDidLoad")
+        Globals.logger.log("*** In ViewController viewDidLoad")
+        
+        Globals.viewController = self
         
         NSEvent.addLocalMonitorForEvents(matching: .keyDown) {
             if self.myKeyDown(with: $0) {
@@ -41,7 +43,7 @@ class ViewController: NSViewController {
         
         var c = 0
         for arg in CommandLine.arguments {
-            logger.log("argument \(c, privacy: .public) is: \(arg, privacy: .public)")
+            Globals.logger.log("argument \(c, privacy: .public) is: \(arg, privacy: .public)")
             c += 1
         }
         
@@ -49,46 +51,46 @@ class ViewController: NSViewController {
         
         if CommandLine.argc >= 2
         {
-            movieFilepath = CommandLine.arguments[1]
+            Globals.movieFilepath = CommandLine.arguments[1]
             
             if CommandLine.argc >= 2
             {
                 portReq = CommandLine.arguments[2]
                 if ( portReq == "A" )
                 {
-                    port = portA
+                    // Globals.port = Globals.portA
                     channelListen = channel11
                 }
                 else if ( portReq == "B")
                 {
-                    port = portB
+                    // Globals.port = Globals.portB
                     channelListen = channel12
                 }
             }
         }
         else if CommandLine.argc >= 1
         {
-            movieFilepath = CommandLine.arguments[0]
+            Globals.movieFilepath = CommandLine.arguments[0]
         }
         
         let tempChannel = channelListen + 1     // MIDI Channel data is from 0x00 to 0x0F, but the channels are named one through fifteen
         
-        logger.log("*** In ViewController viewDidLoad - MIDI Channel =  \(tempChannel, privacy: .public)")
+        Globals.logger.log("*** In ViewController viewDidLoad - MIDI Channel =  \(tempChannel, privacy: .public)")
         
-        logger.log("*** In ViewController viewDidLoad - UDP Port =  \(port.debugDescription, privacy: .public)")
+        // Globals.logger.log("*** In ViewController viewDidLoad - UDP Port =  \(Globals.port.debugDescription, privacy: .public)")
         
-        logger.log("*** In ViewController viewDidLoad - movieFilepath =  \(movieFilepath, privacy: .public)")
+        Globals.logger.log("*** In ViewController viewDidLoad - movieFilepath =  \(Globals.movieFilepath, privacy: .public)")
         
         
-        mainScreenName = NSScreen.screens[0].localizedName      // always the main display
+        Globals.mainScreenName = NSScreen.screens[0].localizedName      // always the main display
         
         c = 0
         for screen in NSScreen.screens {
-            logger.log("screen \(c) is: \(screen.localizedName, privacy: .public)")
+            Globals.logger.log("screen \(c) is: \(screen.localizedName, privacy: .public)")
             c += 1
         }
         
-        let url = URL(fileURLWithPath: movieFilepath)
+        let url = URL(fileURLWithPath: Globals.movieFilepath)
         
             //
         
@@ -102,9 +104,9 @@ class ViewController: NSViewController {
             // Create a new AVPlayerItem with the asset and an
             // array of asset keys to be automatically loaded
         
-        logger.log("*** In ViewController viewDidLoad - creating playerItem")
+        Globals.logger.log("*** In ViewController viewDidLoad - creating playerItem")
         
-        playerItem = AVPlayerItem(asset: asset,
+        Globals.playerItem = AVPlayerItem(asset: asset,
                                   automaticallyLoadedAssetKeys: assetKeys)
         
             // Register as an observer of the player item's status property
@@ -118,42 +120,50 @@ class ViewController: NSViewController {
         
             // Associate the player item with the player
         
-        logger.log("*** In ViewController viewDidLoad - create an AVPlayer bound to the player item")
+        Globals.logger.log("*** In ViewController viewDidLoad - create an AVPlayer bound to the player item")
         
-        player =   AVPlayer(playerItem: playerItem)
+        Globals.player =   AVPlayer(playerItem: Globals.playerItem)
         
-        if player.error != nil {
-            let emsg = player.error?.localizedDescription
-            logger.log("*** In ViewController viewDidLoad - player.error  \(emsg ?? "?" , privacy: .public)")
+        if Globals.player.error != nil {
+            let emsg = Globals.player.error?.localizedDescription
+            Globals.logger.log("*** In ViewController viewDidLoad - player.error  \(emsg ?? "?" , privacy: .public)")
         }
         
-        logger.log("*** In ViewController viewDidLoad - set playerView.videoGravity")
+        Globals.logger.log("*** In ViewController viewDidLoad - set playerView.videoGravity")
         
         self.playerView.videoGravity = .resizeAspectFill
         
-        logger.log("*** In ViewController viewDidLoad - set playerView.player")
+        Globals.logger.log("*** In ViewController viewDidLoad - set playerView.player")
         
-        playerView.player = player
+        playerView.player = Globals.player
         
-            // loop video. there is a small delay :(
         
-        logger.log("*** In ViewController viewDidLoad - set player observer")
+        /*
+            This is now setup in play() and playInToOut() below
+         
+        // loop video. there is a small delay :(
+        
+        Globals.logger.log("*** In ViewController viewDidLoad - set player observer")
         
         NotificationCenter.default.addObserver(forName: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil, queue: nil) { notification in
-            logger.log("*** In ViewController player observer invoke seek to zero, play")
-            player.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
-            player.play()
+            Globals.logger.log("*** In ViewController player observer invoke seek to zero, play")
+            Globals.player.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
+            Globals.player.play()
         }
+        */
         
-        logger.log("*** In ViewController viewDidLoad - set player preventsDisplaySleepDuringVideoPlayback")
+        Globals.logger.log("*** In ViewController viewDidLoad - set player preventsDisplaySleepDuringVideoPlayback")
         
-        player.preventsDisplaySleepDuringVideoPlayback = true
+        Globals.player.preventsDisplaySleepDuringVideoPlayback = true
         
-            //  player.play()
+        clearBothMarks()
         
-        logger.log("*** In ViewController viewDidLoad - creating UDPListener")
+        /*
+            Removed UDP stuff, now using MIDI and keyboard
+         
+        Globals.logger.log("*** In ViewController viewDidLoad - creating UDPListener")
         
-        listener = UDPListener(on: port)
+        listener = UDPListener(on: Globals.port!)
         
         subscription = listener.$messageReceived.sink(receiveValue: { msgData in
             
@@ -163,14 +173,9 @@ class ViewController: NSViewController {
             let intKeyCode = Int.init(str)
             _ = self.handleKeyPress(keyCode: intKeyCode ?? 0)
         })
+        */
         
-        /*
-         var cancellable = viewModel.$title.sink(receiveValue: { newTitle in
-         print("Title changed to \(newTitle)")
-         })
-         */
-        
-        logger.log("*** In ViewController viewDidLoad - get MIDI info")
+        Globals.logger.log("*** In ViewController viewDidLoad - get MIDI info")
         
         getMIDINames()
         
@@ -180,7 +185,7 @@ class ViewController: NSViewController {
         
         MIDIPortConnectSource(midiInPort, midiSrc, &midiSrc)
         
-        logger.log("*** In ViewController viewDidLoad - viewDidLoad completed")
+        Globals.logger.log("*** In ViewController viewDidLoad - viewDidLoad completed")
     }
     
     
@@ -190,7 +195,7 @@ class ViewController: NSViewController {
                 
             case kVK_Escape:          // Toggle Full Screen
                 
-                logger.log("*** In ViewController handleKeyPress for <Esc>  - setting toggleFullScreen(true)")
+                Globals.logger.log("*** In ViewController handleKeyPress for <Esc>  - setting toggleFullScreen(true)")
                 
                 NSApplication.shared.mainWindow?.toggleFullScreen(true)
                 
@@ -199,51 +204,41 @@ class ViewController: NSViewController {
                 
             case kVK_ANSI_P:          // Play player
                 
-                logger.log("*** In ViewController handleKeyPress for <Esc>  - invoking player.play()")
-                
-                player.play()
+                play()
                 
                 return true
                 
             case kVK_ANSI_Q:          // Quit player
                 
-                logger.log("*** In ViewController handleKeyPress for <Esc>  - invoking terminate(self)")
+                Globals.logger.log("*** In ViewController handleKeyPress for <Esc>  - invoking terminate(self)")
                 
                 NSApplication.shared.terminate(self)
                 
                 return true
                 
             case kVK_ANSI_R:          // Rewind player
-                
-                logger.log("*** In ViewController handleKeyPress for <Esc>  - invoking player.seek(to: .zero)")
-                
-                player.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
+
+                goToBegin()
                 
                 return true
                 
             case kVK_ANSI_S, kVK_Space: // Stop player
-                
-                logger.log("*** In ViewController handleKeyPress for <Esc>  - invoking player.pause()")
-                
-                player.pause()
+                              
+                pause()
                 
                 return true
                 
             case kVK_LeftArrow:       // backward one frame
                 
-                logger.log("*** In ViewController handleKeyPress for <Esc>  - invoking            playerItem?.step(byCount: -1)")
-                
-                player.pause()
-                playerItem?.step(byCount: -1)
+                pause()
+                Globals.playerItem?.step(byCount: -1)
                 
                 return true
                 
             case kVK_RightArrow:      // forward one frame
                 
-                logger.log("*** In ViewController handleKeyPress for <Esc>  - invoking            playerItem?.step(byCount: 1)")
-                
-                player.pause()
-                playerItem?.step(byCount: 1)
+                pause()
+                Globals.playerItem?.step(byCount: 1)
                 
                 return true
                 
@@ -253,41 +248,31 @@ class ViewController: NSViewController {
             
                 // rewind aka go to start
                     
-                player!.pause()
-                player!.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
+                goToBegin()
                 
                 return true
                 
             case kVK_F3:      // pause
                 
-                player!.pause()
+                pause()
                 
                 return true
                 
             case kVK_F4:      // play
                 
-                player!.rate = playbackRate
+                play()
                 
                 return true
                 
             case kVK_F5:      // play in to out
                 
-                // to-do implement this!
-                
-                player!.pause()
-                player.seek(to: markIn, toleranceBefore: .zero, toleranceAfter: .zero)
-                
-                // player!.rate = playbackRate
+                playInToOut()
                 
                 return true
 
             case kVK_F6:       // go to end
                 
-                player!.pause()
-                
-                let endOfMovie = playerItem.asset.duration
-                
-                player!.seek(to: endOfMovie, toleranceBefore: .zero, toleranceAfter: .zero)
+                goToEnd()
                 
                 return true
                 
@@ -295,8 +280,7 @@ class ViewController: NSViewController {
                 
                 // Go To In mark
                 
-                player!.pause()
-                player.seek(to: markIn, toleranceBefore: .zero, toleranceAfter: .zero)
+                goToMarkIn()
 
                 return true
                 
@@ -304,8 +288,7 @@ class ViewController: NSViewController {
                 
                 // Go To Out mark
                 
-                player!.pause()
-                player.seek(to: markOut, toleranceBefore: .zero, toleranceAfter: .zero)
+                goToMarkOut()
 
                 return true
                 
@@ -313,7 +296,7 @@ class ViewController: NSViewController {
                 
                 // Mark In
                 
-                markIn = player.currentTime()
+                setMarkIn()
 
                 return true
              
@@ -321,7 +304,7 @@ class ViewController: NSViewController {
                 
                 // Mark Out
                 
-                markOut = player.currentTime()
+                setMarkOut()
                 
                 return true
                 
@@ -329,7 +312,7 @@ class ViewController: NSViewController {
             
                 // clear In mark
                 
-                markIn = CMTime.zero
+                clearMarkIn()
                 
                 return true
                 
@@ -337,12 +320,12 @@ class ViewController: NSViewController {
                 
                 // clear Out mark
                 
-                markOut = playerItem.asset.duration
+                clearMarkOut()
 
                 return true
 
             default:
-                logger.log("*** In ViewController handleKeyPress - unrecognized key code =  \(keyCode, privacy: .public)")
+                Globals.logger.log("*** In ViewController handleKeyPress - unrecognized key code =  \(keyCode, privacy: .public)")
                 
                 return false
         }
@@ -363,10 +346,135 @@ class ViewController: NSViewController {
         
     }
     
-    override var representedObject: Any? {
+    public override var representedObject: Any? {
         didSet {
                 // Update the view, if already loaded.
         }
     }
     
+    public func rewind()
+    {
+        pause()
+        goToBegin()
+    }
+    
+    public func play()
+    {
+        pause()
+        
+        NotificationCenter.default.removeObserver(self)
+        
+        Globals.player?.actionAtItemEnd = .none
+            NotificationCenter.default.addObserver(self,
+                selector: #selector(self.playerItemDidReachEnd),
+                 name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,
+                 object: Globals.player?.currentItem)
+
+        Globals.player?.currentItem!.reversePlaybackEndTime =  CMTime.zero
+        Globals.player?.currentItem!.forwardPlaybackEndTime =  Globals.playerItem.asset.duration
+        
+        Globals.player!.rate = playbackRate
+    }
+    
+    @objc func playerItemDidReachEnd(notification: NSNotification) {
+               
+        if let playerItem: AVPlayerItem = notification.object as? AVPlayerItem {
+            playerItem.seek(to: CMTime.zero, completionHandler: nil)
+        }
+    }
+    
+    public func playInToOut()
+    {
+        Globals.player!.pause()
+        goToMarkIn()
+        
+        NotificationCenter.default.removeObserver(self)
+        
+        Globals.player?.actionAtItemEnd = .none
+            NotificationCenter.default.addObserver(self,
+                selector: #selector(self.playerItemDidReachMarkOut),
+                 name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,
+                 object: Globals.player?.currentItem)
+
+        
+        Globals.player?.currentItem!.reversePlaybackEndTime =  markIn
+        Globals.player?.currentItem!.forwardPlaybackEndTime =  markOut
+        
+        Globals.player!.rate = playbackRate
+        
+    }
+
+    @objc func playerItemDidReachMarkOut(notification: NSNotification) {
+               
+        if let playerItem: AVPlayerItem = notification.object as? AVPlayerItem {
+            playerItem.seek(to: markIn, completionHandler: nil)
+        }
+    }
+    
+    public func reset()
+    {
+        pause()
+        playbackRate = 1.0      // Normal speed the next time Play is requested
+        clearBothMarks()
+    }
+
+    public func pause()
+    {
+        Globals.player!.pause()
+    }
+    
+    public func goToBegin()
+    {
+        pause()
+        
+        Globals.player!.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
+    }
+    
+    public func goToEnd()
+    {
+        pause()
+        
+        let endOfMovie = Globals.playerItem.asset.duration
+        Globals.player!.seek(to: endOfMovie, toleranceBefore: .zero, toleranceAfter: .zero)
+    }
+    
+    public func goToMarkIn()
+    {
+        pause()
+        
+        Globals.player.seek(to: markIn, toleranceBefore: .zero, toleranceAfter: .zero)
+    }
+    
+    public func goToMarkOut()
+    {
+        pause()
+        
+        Globals.player.seek(to: markOut, toleranceBefore: .zero, toleranceAfter: .zero)
+    }
+    
+    public func setMarkIn()
+    {
+        markIn = Globals.player.currentTime()
+    }
+    
+    public func setMarkOut()
+    {
+        markOut = Globals.player.currentTime()
+    }
+    
+    public func clearMarkIn()
+    {
+        markIn = CMTime.zero
+    }
+    
+    public func clearMarkOut()
+    {
+        markOut = Globals.playerItem.asset.duration
+    }
+    
+    public func clearBothMarks()
+    {
+        clearMarkIn()
+        clearMarkOut()
+    }
 }

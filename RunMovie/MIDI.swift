@@ -625,56 +625,65 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
 
                 case pad02:      // go to start
                     
-                    player!.pause()
-                    player!.seek(to: .zero)
+                    Globals.viewController?.goToBegin()
                     
                 case pad03:      // pause
 
-                    player!.pause()
+                    Globals.viewController?.pause()
                     
                 case pad04:      // play
                     
-                    player!.rate = playbackRate
+                    Globals.viewController?.play()
                     
                 case pad05:      // play In to Out
                     
-                    playInToOut()
+                    Globals.viewController?.playInToOut()
 
                     break
                     
                 case pad06:       // go to end
                     
-                    player!.pause()
-                    
-                    let endOfMovie = playerItem.asset.duration
-                    
-                    player!.seek(to: endOfMovie, toleranceBefore: .zero, toleranceAfter: .zero)
+                    Globals.viewController?.goToEnd()
 
                 case pad07:
+                    
+                    Globals.viewController?.goToMarkIn()
                     
                     break
 
                 case pad08:
                     
+                    Globals.viewController?.goToMarkOut()
+                    
                     break
 
                 case pad09:
+                    
+                    Globals.viewController?.setMarkIn()
                     
                     break
 
                 case pad10:
                     
+                    Globals.viewController?.setMarkOut()
+                    
                     break
 
                 case pad11:
+                    
+                    Globals.viewController?.clearMarkIn()
                     
                     break
 
                 case pad12:
                     
+                    Globals.viewController?.clearMarkOut()
+                    
                     break
 
                 case pad13:
+                    
+                    Globals.viewController?.clearBothMarks()
                     
                     break
 
@@ -771,86 +780,63 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
                     
                 case button02:      // rewind aka go to start
                     
-                    player!.pause()
-                    player!.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
+                    Globals.viewController?.goToBegin()
                     
                 case button03:      // pause
 
-                    player!.pause()
+                    Globals.viewController?.pause()
                     
                 case button04:      // play
                     
-                    player!.rate = playbackRate
+                    Globals.viewController?.play()
                     
                 case button05:      // play In to Out
                     
-                    playInToOut()
+                    Globals.viewController?.playInToOut()
 
                 case button06:       // go to end
                     
-                    player!.pause()
-                    
-                    let endOfMovie = playerItem.asset.duration
-                    
-                    player!.seek(to: endOfMovie, toleranceBefore: .zero, toleranceAfter: .zero)
-  
+                    Globals.viewController?.goToEnd()
+                     
                 case button07:
                     
-                    // Go To In mark
-                    
-                    player!.pause()
-                    player.seek(to: markIn, toleranceBefore: .zero, toleranceAfter: .zero)
+                    Globals.viewController?.goToMarkIn()
                     
                     break
 
                 case button08:
                     
-                    // Go To Out mark
-                    
-                    player!.pause()
-                    player.seek(to: markOut, toleranceBefore: .zero, toleranceAfter: .zero)
+                    Globals.viewController?.goToMarkOut()
                     
                     break
                     
                 case button09:
                     
-                    // Mark In
-                    
-                    markIn = player.currentTime()
+                    Globals.viewController?.setMarkIn()
                     
                     break
 
                 case button10:
                     
-                    // Mark Out
-                    
-                    markOut = player.currentTime()
+                    Globals.viewController?.setMarkOut()
                     
                     break
 
                 case button11:
                     
-                    // clear In mark
-                    
-                    markIn = CMTime.zero
+                    Globals.viewController?.clearMarkIn()
                     
                     break
 
                 case button12:
                     
-                    // clear Out mark
-                    
-                    markOut = playerItem.asset.duration
+                    Globals.viewController?.clearMarkOut()
  
                     break
 
                 case button13:
                     
-                    // clear both In and Out marks
-                    
-                    markIn = CMTime.zero
-                    
-                    markOut = playerItem.asset.duration
+                    Globals.viewController?.clearBothMarks()
                     
                     break
 
@@ -868,12 +854,7 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
 
                 case button16:
                     
-                    playbackRate = 1.0      // Normal speed the next time Play is requested
-                    player!.pause()
-                    
-                    markIn = CMTime.zero
-                    
-                    markOut = playerItem.asset.duration
+                    Globals.viewController?.reset()
                     
                     break
 
@@ -884,11 +865,11 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
                         
         case transportPlay:
             
-            player!.rate = playbackRate
+            Globals.viewController?.play()
             
         case transportStop:
             
-            player!.pause()
+            Globals.viewController?.pause()
             
         default:
             return
@@ -904,11 +885,11 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
         
         if ( speedValue >= 127 )
         {
-            value = player.rate - 0.1
+            value = Globals.player.rate - 0.1
         }
         else if ( speedValue == 1 )
         {
-            value = player.rate + 0.1
+            value = Globals.player.rate + 0.1
         }
         else
         {
@@ -917,19 +898,19 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
         
         if ( value <= 10.0 && value >= -10.0 )
         {
-            player.rate = value
+            Globals.player.rate = value
             
-            let speedStr = String(format:"$%.2f ", player.rate)
+            let speedStr = String(format:"$%.2f ", Globals.player.rate)
             print(speedStr)
             
-            playbackRate = player.rate
+            playbackRate = Globals.player.rate
         }
     }
     
     func jogPlayer( jogScale: UInt8, jogValue: Int )
     {
     
-        if ( player == nil || playerItem == nil || jogValue == 0 )
+        if ( Globals.player == nil || Globals.playerItem == nil || jogValue == 0 )
         {
             return
         }
@@ -941,9 +922,9 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
             value = -1
         }
     
-        let tracks = playerItem.asset.tracks(withMediaType: .video)
+        let tracks = Globals.playerItem.asset.tracks(withMediaType: .video)
         let fps = tracks.first?.nominalFrameRate
-        let duration = playerItem.asset.duration
+        let duration = Globals.playerItem.asset.duration
 
         let videoFPS = Double(fps!)
         let totalFrames = Double(videoFPS) * duration.seconds
@@ -980,54 +961,17 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
         
         let span = Double(value) * unitSize / videoFPS
                 
-        player!.pause()
+        Globals.player!.pause()
 
-        let currentTime = player.currentTime()
+        let currentTime = Globals.player.currentTime()
         let newTime = currentTime.seconds.advanced(by: span)
         
         let seekTime = CMTimeMakeWithSeconds(newTime, preferredTimescale: 1000 )
               
-        player.seek(to: seekTime, toleranceBefore: .zero, toleranceAfter: .zero)
+        Globals.player.seek(to: seekTime, toleranceBefore: .zero, toleranceAfter: .zero)
         
     }
     
     // Similar code in VideoFilters program, ContentView.swift
-    
-    func playInToOut() {
-        
-        player!.pause()
-
-        player?.seek(to:  markIn, toleranceBefore: .zero, toleranceAfter: .zero)
-        
-        /*
-        
-         NotificationCenter.default.removeObserver(self)
-        
-            player?.actionAtItemEnd = .none
-            NotificationCenter.default.addObserver(self,
-                selector: #selector(self.playerItemDidReachMarkOut),
-                 name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,
-                 object: player?.currentItem)
-
-        
-        player?.currentItem!.reversePlaybackEndTime =  markIn
-        player?.currentItem!.forwardPlaybackEndTime =  markOut
-        
-        player!.rate = playbackRate
-        
-        */
-        
-    }
-    
-    /*
-    
-    @objc func playerItemDidReachMarkOut(notification: NSNotification) {
-               
-        if let playerItem: AVPlayerItem = notification.object as? AVPlayerItem {
-            playerItem.seek(to: markIn, completionHandler: nil)
-        }
-    }
-    
-    */
     
 }

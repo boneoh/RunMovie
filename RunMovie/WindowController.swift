@@ -16,11 +16,11 @@ class WindowController: NSWindowController, NSWindowDelegate {
     
         // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
  
-        logger.log("*** In WindowController windowDidLoad")
+        Globals.logger.log("*** In WindowController windowDidLoad")
         
         showWindow (nil)
         
-        self.window?.title = movieFilepath
+        self.window?.title = Globals.movieFilepath
         
  
         window!.titleVisibility = .hidden
@@ -40,13 +40,13 @@ class WindowController: NSWindowController, NSWindowDelegate {
     }
 
     func windowDidEnterFullScreen(_ notification: Notification) {
-        logger.log("*** In WindowController windowDidEnterFullScreen - set isWindowFullScreen = true")
-        isWindowFullScreen = true
+        Globals.logger.log("*** In WindowController windowDidEnterFullScreen - set isWindowFullScreen = true")
+        Globals.isWindowFullScreen = true
     }
     
     func windowDidExitFullScreen(_ notification: Notification) {
-        logger.log("*** In WindowController windowDidExitFullScreen - isWindowFullScreen = false")
-        isWindowFullScreen = false
+        Globals.logger.log("*** In WindowController windowDidExitFullScreen - isWindowFullScreen = false")
+        Globals.isWindowFullScreen = false
     }
  
  
@@ -65,25 +65,28 @@ class WindowController: NSWindowController, NSWindowDelegate {
         
         let mainDisplay = NSScreen.screens[0]
         
-        logger.log("*** In WindowController windowDidChangeScreenscreen main    display is: \(mainDisplay.localizedName, privacy: .public)")
-        logger.log("*** In WindowController windowDidChangeScreenscreen current display is: \(name, privacy: .public)")
+        Globals.logger.log("*** In WindowController windowDidChangeScreenscreen main    display is: \(mainDisplay.localizedName, privacy: .public)")
+        Globals.logger.log("*** In WindowController windowDidChangeScreenscreen current display is: \(name, privacy: .public)")
         
         if x >= mainDisplay.visibleFrame.minX && x <= mainDisplay.visibleFrame.maxX &&
            y >= mainDisplay.visibleFrame.minY && y <= mainDisplay.visibleFrame.maxY
         {
-            logger.log("*** In WindowController windowDidChangeScreen - window is on main display:  \(mainDisplay.localizedName, privacy: .public)")
+            Globals.logger.log("*** In WindowController windowDidChangeScreen - window is on main display:  \(mainDisplay.localizedName, privacy: .public)")
             return
         }
         
-        logger.log("*** In WindowController windowDidChangeScreen - window is NOT on main display:  \(mainDisplay.localizedName, privacy: .public)")
+        Globals.logger.log("*** In WindowController windowDidChangeScreen - window is NOT on main display:  \(mainDisplay.localizedName, privacy: .public)")
         
         // make the window full screen without menu bar etc.
                 
         checkFullScreen()
-             
-        player!.pause()
-        player.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
+          
+        Globals.viewController?.goToBegin()
         
+        /*
+        Globals.player!.pause()
+        Globals.player.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
+        */
         
         /*
         DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
@@ -99,14 +102,14 @@ class WindowController: NSWindowController, NSWindowDelegate {
     
     func window(_ window: NSWindow, willUseFullScreenPresentationOptions proposedOptions: NSApplication.PresentationOptions = []) -> NSApplication.PresentationOptions {
         
-        logger.log("*** In WindowController window")
+        Globals.logger.log("*** In WindowController window")
         
         return [.autoHideToolbar, .autoHideMenuBar, .fullScreen]
     }
     
     func checkFullScreen() {
         
-        logger.log("*** In WindowController checkFullScreen")
+        Globals.logger.log("*** In WindowController checkFullScreen")
         
         /*
         if processingHomeCommand == true
@@ -116,32 +119,32 @@ class WindowController: NSWindowController, NSWindowDelegate {
         }
         */
         
-        isWindowFullScreen = window!.styleMask.contains(.fullScreen)
+        Globals.isWindowFullScreen = window!.styleMask.contains(.fullScreen)
         
-        if isWindowFullScreen == true
+        if Globals.isWindowFullScreen == true
         {
-            logger.log("*** In WindowController checkFullScreen - isWindowFullScreen == true")
+            Globals.logger.log("*** In WindowController checkFullScreen - isWindowFullScreen == true")
             return
         }
         
-        if isWindowCreated == true
+        if Globals.isWindowCreated == true
         {
-            logger.log("*** In WindowController checkFullScreen - isWindowCreated == true")
+            Globals.logger.log("*** In WindowController checkFullScreen - isWindowCreated == true")
             return
         }
         
        
-        logger.log("*** In WindowController checkFullScreen - isWindowFullScreen == false")
+        Globals.logger.log("*** In WindowController checkFullScreen - isWindowFullScreen == false")
         
         if NSApplication.shared.mainWindow != nil
         {
-            logger.log("*** In WindowController checkFullScreen - set isWindowFullScreen = true")
+            Globals.logger.log("*** In WindowController checkFullScreen - set isWindowFullScreen = true")
             
-            isWindowFullScreen = true
+            Globals.isWindowFullScreen = true
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 
-                logger.log("*** In WindowController checkFullScreen - setting toggleFullScreen(true)")
+                Globals.logger.log("*** In WindowController checkFullScreen - setting toggleFullScreen(true)")
                 
                 NSApplication.shared.mainWindow?.toggleFullScreen(true)
                 
