@@ -3,4 +3,70 @@
    uuid = "10AACF8A-B3F8-43B8-A979-5351C1D6402B"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "E963306A-A5EB-41E3-B242-6D30BC2D6CF3"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "RunMovie/ViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "54"
+            endingLineNumber = "54"
+            landmarkName = "viewDidLoad()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "E963306A-A5EB-41E3-B242-6D30BC2D6CF3 - 53d30543783f37eb"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "RunMovie.ViewController.viewDidLoad() -&gt; ()"
+                  moduleName = "RunMovie"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/RAID%205/Mod%20Synth/Apple/RunMovie/RunMovie/ViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "54"
+                  endingLineNumber = "54"
+                  offsetFromSymbolStart = "5156">
+               </Location>
+               <Location
+                  uuid = "E963306A-A5EB-41E3-B242-6D30BC2D6CF3 - 53d30543783f37eb"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "RunMovie.ViewController.viewDidLoad() -&gt; ()"
+                  moduleName = "RunMovie"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Volumes/RAID%205/Mod%20Synth/Apple/RunMovie/RunMovie/ViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "54"
+                  endingLineNumber = "54"
+                  offsetFromSymbolStart = "5204">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "644B92C0-5227-46AD-AD22-05F484AD0DF8"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "RunMovie/ViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "189"
+            endingLineNumber = "189"
+            landmarkName = "viewDidLoad()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

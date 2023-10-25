@@ -19,7 +19,7 @@ public var midiSrc:MIDIEndpointRef = MIDIGetSource(0) // should be "Arturia Beat
 
 // MIDI Channels are 1 - 16, but commands are suffixed 0x_0 to 0x_F
 
-// We are looking for Port A, Port B, and common subset.
+// We are looking for Port A, Port B, Port C and common subset.
 
 public let channel01: UInt8 = 0x00
 public let channel02: UInt8 = 0x01
@@ -33,7 +33,7 @@ public let channel09: UInt8 = 0x08
 public let channel10: UInt8 = 0x09
 public let channel11: UInt8 = 0x0A  // RunMovie on iMac, port A
 public let channel12: UInt8 = 0x0B  // RunMovie on iMac, port B
-public let channel13: UInt8 = 0x0C  // Maybe some day RunMovie will have port C?
+public let channel13: UInt8 = 0x0C  // RunMovie on iMac, port C
 public let channel14: UInt8 = 0x0D  // CUDA programs on Jetson Nano
 public let channel15: UInt8 = 0x0E  // Blackmagic Design HyperDeck HD Mini
 public let channel16: UInt8 = 0x0F  // common subset of commands, used for all channels
@@ -43,10 +43,11 @@ public let channelMask: UInt8 = 0x0F
 
 // channels to be monitored
 
-public var channelListen:       UInt8 = 0       // for RunMovie will be either channelA or channelB
+public var channelListen:       UInt8 = 0       // for RunMovie will be either channelA, channelB, channelC
 
 public let channelA:            UInt8 = channel11
 public let channelB:            UInt8 = channel12
+public let channelC:            UInt8 = channel13
 public var channelCommon:       UInt8 = channel16
 
 // commands

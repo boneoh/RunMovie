@@ -72,12 +72,12 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "&quot;/Volumes/RAID 5/Video/Boneoh/Video Captures/Grapher /Shapes loop w Timecode.mov&quot;"
-            isEnabled = "YES">
+            argument = "&quot;/Volumes/SSD 2TB/Video/Boneoh/Video Captures/Particles/Particles 3.Alpha.4444.mov&quot;"
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "A"
-            isEnabled = "YES">
+            argument = "C"
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
    </LaunchAction>

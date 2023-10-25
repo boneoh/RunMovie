@@ -40,37 +40,154 @@ public class ViewController: NSViewController {
                 return $0
             }
         }
-        
+               
         var c = 0
         for arg in CommandLine.arguments {
             Globals.logger.log("argument \(c, privacy: .public) is: \(arg, privacy: .public)")
             c += 1
         }
         
-        channelListen = channel11
+        var saveDefaultMovieFile: Bool = true
+        let fileMgr = FileManager()
+        var isDir : ObjCBool = true
         
-        if CommandLine.argc >= 2
+        let programPath = Bundle.main.executablePath
+        
+        let programName1 = "RunMovie.app"
+        let programName2 = "RunMovie2.app"
+        let programName3 = "RunMovie3.app"
+        
+        var suffix = ""
+        
+        if programPath!.localizedCaseInsensitiveContains(programName1)
         {
-            Globals.movieFilepath = CommandLine.arguments[1]
+            // default
+        }
+        else if programPath!.localizedCaseInsensitiveContains(programName2)
+        {
+            suffix = "2"
+        }
+        else if programPath!.localizedCaseInsensitiveContains(programName3)
+        {
+            suffix = "3"
+        }
+        
+        var movieKeyName = "MovieFileOpenPath" + suffix
+        var midiKeyName = "MidiChannel" + suffix
+
+        Globals.logger.log("*** In ViewController viewDidLoad - movieKeyName =  \(movieKeyName, privacy: .public)")
+        Globals.logger.log("*** In ViewController viewDidLoad - midiKeyName =  \(midiKeyName, privacy: .public)")
+        
+        var path  = UserDefaults.standard.string(forKey: movieKeyName)
+        if ( path != nil && path?.isEmpty == false )
+        {
+            Globals.logger.log("*** In ViewController viewDidLoad - default movie =  \(path!, privacy: .public)")
             
-            if CommandLine.argc >= 2
+            if ( fileMgr.fileExists(atPath: path!, isDirectory:  &isDir) == true )
             {
+                Globals.movieFilepath = path!
+            }
+            else
+            {
+                saveDefaultMovieFile = false
+            }
+        }
+        
+        channelListen = channelA
+
+        var saveDefaultChannel: Bool = true
+        
+        var channelListenString = UserDefaults.standard.string(forKey: midiKeyName)
+        if ( channelListenString != nil )
+        {
+            Globals.logger.log("*** In ViewController viewDidLoad - default MIDI channel =  \(channelListenString!, privacy: .public)")
+            
+            if ( channelListenString == "A" )
+            {
+                channelListen = channelA
+            }
+            else if ( channelListenString == "B")
+            {
+                channelListen = channelB
+            }
+            else if ( channelListenString == "C")
+            {
+                channelListen = channelC
+            }
+            else
+            {
+                saveDefaultChannel = false
+                channelListen = channelA
+                channelListenString = "A"
+            }
+        }
+        else
+        {
+            channelListenString = "A"
+        }
+        
+        if CommandLine.argc >= 2 && CommandLine.arguments[1] != "-NSDocumentRevisionsDebugMode"
+        {
+            saveDefaultMovieFile = false
+            
+            path = CommandLine.arguments[1]
+            Globals.movieFilepath = path!
+            
+            if ( fileMgr.fileExists(atPath: path!, isDirectory:  &isDir) == true )
+            {
+                saveDefaultMovieFile = true
+            }
+
+            
+            if CommandLine.argc >= 3
+            {
+                saveDefaultChannel = false
+                
                 portReq = CommandLine.arguments[2]
+                
+                channelListenString = portReq
+                
                 if ( portReq == "A" )
                 {
                     // Globals.port = Globals.portA
-                    channelListen = channel11
+                    channelListen = channelA
                 }
                 else if ( portReq == "B")
                 {
                     // Globals.port = Globals.portB
-                    channelListen = channel12
+                    channelListen = channelB
+                }
+                else if ( portReq == "C")
+                {
+                    // Globals.port = Globals.portC
+                    channelListen = channelC
+                }
+                else
+                {
+                    channelListen = channelA
+                    channelListenString = "A"
                 }
             }
         }
+        
+        /*
         else if CommandLine.argc >= 1
         {
             Globals.movieFilepath = CommandLine.arguments[0]
+        }
+        */
+        
+        
+        if saveDefaultMovieFile == true
+        {
+            Globals.logger.log("*** In ViewController viewDidLoad - saving new default movie =  \(Globals.movieFilepath, privacy: .public)")
+            UserDefaults.standard.set( Globals.movieFilepath, forKey: movieKeyName)
+        }
+        
+        if saveDefaultChannel == true
+        {
+            Globals.logger.log("*** In ViewController viewDidLoad - saving new default MIDI channel =  \(channelListenString!, privacy: .public)")
+            UserDefaults.standard.set( channelListenString, forKey: midiKeyName)
         }
         
         let tempChannel = channelListen + 1     // MIDI Channel data is from 0x00 to 0x0F, but the channels are named one through fifteen
