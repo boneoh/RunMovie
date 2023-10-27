@@ -57,24 +57,28 @@ public class ViewController: NSViewController {
         let programName2 = "RunMovie2.app"
         let programName3 = "RunMovie3.app"
         
+        var displayName = ""
+        
         var suffix = ""
         
         if programPath!.localizedCaseInsensitiveContains(programName1)
         {
-            // default
+            displayName = "Blackmagic (1)"
         }
         else if programPath!.localizedCaseInsensitiveContains(programName2)
         {
             suffix = "2"
+            displayName = "Blackmagic (2)"
         }
         else if programPath!.localizedCaseInsensitiveContains(programName3)
         {
             suffix = "3"
+            displayName = "Blackmagic (3)"
         }
         
-        var movieKeyName = "MovieFileOpenPath" + suffix
-        var midiKeyName = "MidiChannel" + suffix
-
+        let movieKeyName = "MovieFileOpenPath" + suffix
+        let midiKeyName = "MidiChannel" + suffix
+        
         Globals.logger.log("*** In ViewController viewDidLoad - movieKeyName =  \(movieKeyName, privacy: .public)")
         Globals.logger.log("*** In ViewController viewDidLoad - midiKeyName =  \(midiKeyName, privacy: .public)")
         
@@ -190,6 +194,7 @@ public class ViewController: NSViewController {
             UserDefaults.standard.set( channelListenString, forKey: midiKeyName)
         }
         
+        
         let tempChannel = channelListen + 1     // MIDI Channel data is from 0x00 to 0x0F, but the channels are named one through fifteen
         
         Globals.logger.log("*** In ViewController viewDidLoad - MIDI Channel =  \(tempChannel, privacy: .public)")
@@ -198,12 +203,29 @@ public class ViewController: NSViewController {
         
         Globals.logger.log("*** In ViewController viewDidLoad - movieFilepath =  \(Globals.movieFilepath, privacy: .public)")
         
+        // See if we need to move the app window to another screen (display)
         
         Globals.mainScreenName = NSScreen.screens[0].localizedName      // always the main display
         
+        /*
+         screen 0 is: PHL 346E2C
+         screen 1 is: Blackmagic (2)
+         screen 2 is: Blackmagic (1)
+         screen 3 is: Blackmagic (3)
+         */
+        
         c = 0
         for screen in NSScreen.screens {
-            Globals.logger.log("screen \(c) is: \(screen.localizedName, privacy: .public)")
+            
+            let name = screen.localizedName
+            
+            Globals.logger.log("screen \(c) is: \(name, privacy: .public)")
+            
+            if name == displayName
+            {
+                Globals.targetScreen = screen
+            }
+            
             c += 1
         }
         

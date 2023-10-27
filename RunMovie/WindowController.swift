@@ -20,6 +20,8 @@ class WindowController: NSWindowController, NSWindowDelegate {
         
         showWindow (nil)
         
+        Globals.windowController = self
+        
         self.window?.title = Globals.movieFilepath
         
  
@@ -28,6 +30,9 @@ class WindowController: NSWindowController, NSWindowDelegate {
 
         window!.styleMask = [window!.styleMask,  NSWindow.StyleMask.fullSizeContentView]
         
+        Globals.windowSetDisplay()
+        
+        /*
         let dx = 1920.0 / 2.0
         let dy = 1080.0 / 2.0
         
@@ -36,9 +41,10 @@ class WindowController: NSWindowController, NSWindowDelegate {
         pos.x = screens[0].visibleFrame.midX - dx
         pos.y = screens[0].visibleFrame.midY - dy
         self.window?.setFrameOrigin(pos)
- 
+        */
+        
     }
-
+    
     func windowDidEnterFullScreen(_ notification: Notification) {
         Globals.logger.log("*** In WindowController windowDidEnterFullScreen - set isWindowFullScreen = true")
         Globals.isWindowFullScreen = true
@@ -154,4 +160,5 @@ class WindowController: NSWindowController, NSWindowDelegate {
         }
  
     }
+    
 }
