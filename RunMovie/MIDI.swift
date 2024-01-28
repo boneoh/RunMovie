@@ -690,9 +690,13 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
 
                 case pad14:
                     
+                    Globals.player.isMuted = true       // pma 1/23/2024
+                    
                     break
 
                 case pad15:
+                    
+                    Globals.player.isMuted = false      // pma 1/23/2024
                     
                     break
 

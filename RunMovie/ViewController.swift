@@ -114,7 +114,7 @@ public class ViewController: NSViewController {
 
         let saveDefaultChannel: Bool = true
         
-        if ( channelListenString != nil )
+        if ( channelListenString != "" )            // pma 1/23/2024
         {
             Globals.logger.log("*** In ViewController viewDidLoad 1 - default MIDI channel =  \(channelListenString, privacy: .public)")
             
@@ -303,6 +303,9 @@ public class ViewController: NSViewController {
             let emsg = Globals.player.error?.localizedDescription
             Globals.logger.log("*** In ViewController viewDidLoad - player.error  \(emsg ?? "?" , privacy: .public)")
         }
+        
+        Globals.player.isMuted = true                                       // pma 1/23/2024
+        Globals.player.automaticallyWaitsToMinimizeStalling = false         // pma 1/23/2024
         
         Globals.logger.log("*** In ViewController viewDidLoad - set playerView.videoGravity")
         
