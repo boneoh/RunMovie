@@ -32,6 +32,11 @@ class WindowController: NSWindowController, NSWindowDelegate {
         
         Globals.windowSetDisplay()
         
+        Globals.windowWasLoaded = true
+              
+        let currentTemp = CMTime(value: Globals.workspace.currentTime, timescale: 1000, flags: .valid, epoch: 0)
+        Globals.player.seek(to: currentTemp, toleranceBefore: .zero, toleranceAfter: .zero)
+        
         /*
         let dx = 1920.0 / 2.0
         let dy = 1080.0 / 2.0
@@ -53,6 +58,8 @@ class WindowController: NSWindowController, NSWindowDelegate {
     func windowDidExitFullScreen(_ notification: Notification) {
         Globals.logger.log("*** In WindowController windowDidExitFullScreen - isWindowFullScreen = false")
         Globals.isWindowFullScreen = false
+        
+        checkFullScreen()
     }
  
  
@@ -87,7 +94,7 @@ class WindowController: NSWindowController, NSWindowDelegate {
                 
         checkFullScreen()
           
-        Globals.viewController?.goToBegin()
+        // Globals.viewController?.goToBegin()
         
         /*
         Globals.player!.pause()
@@ -148,11 +155,16 @@ class WindowController: NSWindowController, NSWindowDelegate {
             
             Globals.isWindowFullScreen = true
             
+            Globals.player!.pause()
+            
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 
                 Globals.logger.log("*** In WindowController checkFullScreen - setting toggleFullScreen(true)")
                 
                 NSApplication.shared.mainWindow?.toggleFullScreen(true)
+                               
+                let currentTemp = CMTime(value: Globals.workspace.currentTime, timescale: 1000, flags: .valid, epoch: 0)
+                Globals.player.seek(to: currentTemp, toleranceBefore: .zero, toleranceAfter: .zero)
                 
                 // NSCursor.hide()
             }

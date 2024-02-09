@@ -884,6 +884,8 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
     
     func playerSpeed( speedValue: Int )
     {
+        // $$$ Copied to Globals file.
+        
         //  Would be nice to have a similar function receive a Note value
         //  and explicitly set the playback speed. Currently the knob may
         //  need to be turned many times to get to an approximate speed.
@@ -976,6 +978,8 @@ func handleMIDIdata( cmd: UInt8, noteOrKnob: UInt8, value: Int )
         let seekTime = CMTimeMakeWithSeconds(newTime, preferredTimescale: 1000 )
               
         Globals.player.seek(to: seekTime, toleranceBefore: .zero, toleranceAfter: .zero)
+        
+        Globals.viewController?.savePosition()
         
     }
     

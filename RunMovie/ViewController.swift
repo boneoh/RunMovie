@@ -315,6 +315,7 @@ public class ViewController: NSViewController {
         
         playerView.player = Globals.player
         
+        playerView.player?.pause()
         
         /*
             This is now setup in play() and playInToOut() below
@@ -363,6 +364,10 @@ public class ViewController: NSViewController {
         
         MIDIPortConnectSource(midiInPort, midiSrc, &midiSrc)
         
+        Globals.logger.log("*** In ViewController viewDidLoad - open workspace")
+        
+        openWorkspace()
+        
         Globals.logger.log("*** In ViewController viewDidLoad - viewDidLoad completed")
     }
     
@@ -397,12 +402,13 @@ public class ViewController: NSViewController {
             case kVK_ANSI_R:          // Rewind player
 
                 goToBegin()
-                
+               
                 return true
                 
             case kVK_ANSI_S, kVK_Space: // Stop player
                               
                 pause()
+                savePosition()
                 
                 return true
                 
@@ -410,6 +416,7 @@ public class ViewController: NSViewController {
                 
                 pause()
                 Globals.playerItem?.step(byCount: -1)
+                savePosition()
                 
                 return true
                 
@@ -417,6 +424,7 @@ public class ViewController: NSViewController {
                 
                 pause()
                 Globals.playerItem?.step(byCount: 1)
+                savePosition()
                 
                 return true
                 
@@ -588,6 +596,7 @@ public class ViewController: NSViewController {
         
         Globals.player!.rate = playbackRate
         
+        savePosition()
     }
 
     @objc func playerItemDidReachMarkOut(notification: NSNotification) {
@@ -607,6 +616,8 @@ public class ViewController: NSViewController {
     public func pause()
     {
         Globals.player!.pause()
+        
+        savePosition()
     }
     
     public func goToBegin()
@@ -614,6 +625,8 @@ public class ViewController: NSViewController {
         pause()
         
         Globals.player!.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
+        
+        savePosition()
     }
     
     public func goToEnd()
@@ -622,6 +635,8 @@ public class ViewController: NSViewController {
         
         let endOfMovie = Globals.playerItem.asset.duration
         Globals.player!.seek(to: endOfMovie, toleranceBefore: .zero, toleranceAfter: .zero)
+        
+        savePosition()
     }
     
     public func goToMarkIn()
@@ -629,6 +644,8 @@ public class ViewController: NSViewController {
         pause()
         
         Globals.player.seek(to: markIn, toleranceBefore: .zero, toleranceAfter: .zero)
+        
+        savePosition()
     }
     
     public func goToMarkOut()
@@ -636,26 +653,36 @@ public class ViewController: NSViewController {
         pause()
         
         Globals.player.seek(to: markOut, toleranceBefore: .zero, toleranceAfter: .zero)
+        
+        savePosition()
     }
     
     public func setMarkIn()
     {
         markIn = Globals.player.currentTime()
+        Globals.workspace.markIn = markIn.value
+        saveWorkspace()
     }
     
     public func setMarkOut()
     {
         markOut = Globals.player.currentTime()
+        Globals.workspace.markOut = markOut.value
+        saveWorkspace()
     }
     
     public func clearMarkIn()
     {
         markIn = CMTime.zero
+        Globals.workspace.markIn = markIn.value
+        saveWorkspace()
     }
     
     public func clearMarkOut()
     {
         markOut = Globals.playerItem.asset.duration
+        Globals.workspace.markOut = markOut.value
+        saveWorkspace()
     }
     
     public func clearBothMarks()
@@ -706,5 +733,70 @@ public class ViewController: NSViewController {
         {
             NSLog("Screen shot export FAILED")
         }
+    }
+    
+    public func openWorkspace()
+    {
+        let path = Globals.movieFileURL.path
+        
+        let url = NSURL(fileURLWithPath: path).deletingPathExtension?.appendingPathExtension("json") // change extension to .json
+        
+        Globals.workspaceFilepath = url?.path ?? ""
+        
+        let temp = JsonHandler.readJSON(object: Workspace.self, url: url  )
+        
+        if ( temp == nil )
+        {
+            // create a new workspace file
+            saveWorkspace() // save it!
+        }
+        else
+        {
+            let markInTemp = CMTime(value: temp!.markIn, timescale: 1000, flags: .valid, epoch: 0)
+            Globals.setMarkIn(startTime: markInTemp)
+            
+            let markOutTemp = CMTime(value: temp!.markOut, timescale: 1000, flags: .valid, epoch: 0)
+            Globals.setMarkOut(endTime: markOutTemp)
+            
+            markIn = markInTemp
+            markOut = markOutTemp
+            
+            /*
+            let currentTemp = CMTime(value: temp!.currentTime, timescale: 1000, flags: .valid, epoch: 0)
+            Globals.player.seek(to: currentTemp, toleranceBefore: .zero, toleranceAfter: .zero)
+            */
+            
+            Globals.workspace = temp!
+        }
+        
+    }
+    
+    public func saveWorkspace()
+    {
+       
+        if Globals.workspaceFilepath != "" && Globals.windowWasLoaded == true
+        {
+            
+            // Globals.workspace.currentTime = Globals.player.currentTime().value
+            
+            let url =  URL(fileURLWithPath: Globals.workspaceFilepath, isDirectory: false  )
+            
+            JsonHandler.writeJSON(object: Globals.workspace, url: url)
+        }
+    }
+    
+    
+    public func savePosition() 
+    {
+
+        if Globals.workspaceFilepath != "" && Globals.windowWasLoaded == true
+        {
+            let currentTime = Globals.player.currentTime()
+            
+            Globals.workspace.currentTime = currentTime.value
+            
+            saveWorkspace()
+        }
+
     }
 }

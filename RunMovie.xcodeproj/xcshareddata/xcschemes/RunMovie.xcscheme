@@ -72,7 +72,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "&quot;/Volumes/RAID 5/Video/Boneoh/Video Captures/Tests/Three-up Test Patterns w Timecode.mov&quot;"
+            argument = "&quot;/Volumes/SSD 2TB/Video/Boneoh/Video Captures/Tests/Three-up Test Patterns w Timecode.mov&quot;"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
