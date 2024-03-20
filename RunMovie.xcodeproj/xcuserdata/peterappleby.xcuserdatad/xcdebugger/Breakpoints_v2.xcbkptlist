@@ -47,8 +47,7 @@
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "795"
-                  endingLineNumber = "795"
-                  offsetFromSymbolStart = "632">
+                  endingLineNumber = "795">
                </Location>
                <Location
                   uuid = "276E74D7-BB16-4DC5-A2D2-D5CC0897F6AD - 83ab837285893398"
@@ -62,8 +61,7 @@
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "796"
-                  endingLineNumber = "796"
-                  offsetFromSymbolStart = "632">
+                  endingLineNumber = "796">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -94,8 +92,8 @@
             filePath = "RunMovie/WindowController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "166"
-            endingLineNumber = "166"
+            startingLineNumber = "171"
+            endingLineNumber = "171"
             landmarkName = "checkFullScreen()"
             landmarkType = "7">
             <Locations>
@@ -111,8 +109,7 @@
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "166"
-                  endingLineNumber = "166"
-                  offsetFromSymbolStart = "1296">
+                  endingLineNumber = "166">
                </Location>
                <Location
                   uuid = "5BECB392-A365-461B-AA27-7F03CDFF1EC4 - 5c412e8243c9eb3e"
@@ -126,8 +123,7 @@
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "166"
-                  endingLineNumber = "166"
-                  offsetFromSymbolStart = "1512">
+                  endingLineNumber = "166">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -159,8 +155,7 @@
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "556"
-                  endingLineNumber = "556"
-                  offsetFromSymbolStart = "96">
+                  endingLineNumber = "556">
                </Location>
                <Location
                   uuid = "20BCAB8C-4A26-473F-BD80-7C24F97E5B56 - 829fa7345c66ce43"
@@ -174,8 +169,7 @@
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "557"
-                  endingLineNumber = "557"
-                  offsetFromSymbolStart = "96">
+                  endingLineNumber = "557">
                </Location>
             </Locations>
          </BreakpointContent>

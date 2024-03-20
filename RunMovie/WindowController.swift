@@ -117,7 +117,12 @@ class WindowController: NSWindowController, NSWindowDelegate {
         
         Globals.logger.log("*** In WindowController window")
         
-        return [.autoHideToolbar, .autoHideMenuBar, .fullScreen]
+        // pma 3/20/2024 Issue with display moved down. Added .autoHideDock, did not work, was worse! Menu bar appeared!
+
+        return [ .fullScreen, .hideMenuBar, .hideDock, .autoHideToolbar ]
+        // return [.autoHideToolbar, .autoHideMenuBar, .fullScreen ]
+
+        // return [.autoHideToolbar, .autoHideMenuBar, .fullScreen, .autoHideDock]
     }
     
     func checkFullScreen() {
